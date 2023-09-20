@@ -3,6 +3,7 @@ package date_naeun.naeunserver.repository;
 import date_naeun.naeunserver.domain.SkinType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,13 +11,19 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional
 public class SkinTypeRepository {
 
     @PersistenceContext
     private final EntityManager em;
 
-    public void save(SkinType skinType) {
+    public Long save(SkinType skinType) {
         em.persist(skinType);
+        return skinType.getId();
+    }
+
+    public SkinType find(Long id) {
+        return em.find(SkinType.class,id);
     }
 
     public List<SkinType> findAll() {

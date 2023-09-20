@@ -35,7 +35,7 @@ public class SkinTypeService {
     /**
      * 전체 피부 타입 조회
      */
-    public List<SkinType> findALlSkinType() {
+    public List<SkinType> findAllSkinType() {
         return skinType_repository.findAll();
     }
 

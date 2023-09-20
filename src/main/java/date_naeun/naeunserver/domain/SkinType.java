@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.domain;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 /**
  * 피부타입 엔티티
  */
-@Getter
+@Getter @Setter
 @Entity
 @Table(name = "SkinType")
 public class SkinType {
