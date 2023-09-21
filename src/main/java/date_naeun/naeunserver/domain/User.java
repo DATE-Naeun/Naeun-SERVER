@@ -3,6 +3,7 @@ package date_naeun.naeunserver.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -20,14 +21,17 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @Setter
     private String name;
 
     private String email;
 
+    @Setter
+    private String skinType;
+
 //    private List<Cosmetic> cosmeticList;
 //    private List<Ingredient> preferIngrList;
 //    private List<Ingredient> dislikeIngrList;
-//    private String skinType;
 
 
     @Builder
