@@ -22,6 +22,14 @@ public class UserRepository {
         return em.find(User.class, id);
     }
 
+    public User findUserWithSkinType(Long id) {
+        return em.createQuery("select u from User u" +
+                " join fetch u.skinType s" +
+                " where u.id = :id", User.class)
+                .setParameter("id", id)
+                .getSingleResult();
+    }
+
     public List<User> findAll() {
         return em.createQuery("select u from User u", User.class)
                 .getResultList();

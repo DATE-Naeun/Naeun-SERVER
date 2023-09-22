@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
 public class SkinType {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "skinType_id")
     private Long id;
     private String typeName;
 
@@ -32,5 +33,8 @@ public class SkinType {
     @ElementCollection
     @CollectionTable(name = "skin_type_care", joinColumns = @JoinColumn(name = "skin_type_id"))
     private List<String> care;
+
+    @OneToMany(mappedBy = "skinType", cascade = CascadeType.ALL)
+    private List<User> users = new ArrayList<>();
 
 }
