@@ -44,4 +44,9 @@ public class UserRepository {
     public void delete(User user) {
         em.remove(user);
     }
+
+    /* 변경한 user 를 DB에 반영하는 메서드 */
+    public void updateUserCosmetic(User user) {
+        em.merge(user);
+    }
 }
