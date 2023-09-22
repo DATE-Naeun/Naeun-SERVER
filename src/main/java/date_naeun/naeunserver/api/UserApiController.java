@@ -4,7 +4,6 @@ import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.dto.UserDto;
 import date_naeun.naeunserver.dto.UpdateUserNicknameRequestDto;
-import date_naeun.naeunserver.repository.SkinTypeRepository;
 import date_naeun.naeunserver.repository.UserRepository;
 import date_naeun.naeunserver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserApiController {
     private final UserService userService;
     private final UserRepository userRepository;
-    private final SkinTypeRepository skinTypeRepository;
 
     /** TO DO
      * exception 관련 코드 추가
@@ -26,7 +24,6 @@ public class UserApiController {
     @GetMapping("/api/user/{id}")
     public ResultDto<UserDto> getUserInfo(@PathVariable Long id) {
         User user = userRepository.findUserWithSkinType(id);
-        skinTypeRepository.find(user.getSkinType().getId());
         return ResultDto.of(HttpStatus.OK, "유저 조회 성공", new UserDto(user));
     }
 
