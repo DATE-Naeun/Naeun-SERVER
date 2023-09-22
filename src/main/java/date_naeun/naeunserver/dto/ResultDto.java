@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Data @RequiredArgsConstructor(staticName = "of")
 public class ResultDto<D> {
-    private final HttpStatus resultCode;
+    private final HttpStatus code;
     private final String message;
     private final D data;
 }
