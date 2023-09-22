@@ -7,19 +7,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 회원 엔티티
  */
 @Getter
 @Entity
-@Table(name="User_table")
+@Table(name="user_table")
 @NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column
     private Long id;
 
     @Setter
@@ -32,7 +34,11 @@ public class User {
     @JoinColumn(name = "skinType_id")
     private SkinType skinType;
 
-//    private List<Cosmetic> cosmeticList;
+    // 화장품의 id만 추가
+    @ElementCollection
+    @CollectionTable(name = "user_cosmetic_list", joinColumns = @JoinColumn(name = "user_id"))
+    private final List<Long> userCosmeticList = new ArrayList<>();
+
 //    private List<Ingredient> preferIngrList;
 //    private List<Ingredient> dislikeIngrList;
 
