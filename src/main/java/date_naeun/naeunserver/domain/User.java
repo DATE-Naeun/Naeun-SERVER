@@ -1,8 +1,10 @@
 package date_naeun.naeunserver.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -17,17 +19,22 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "user_id")
     private Long id;
 
+    @Setter
     private String name;
 
     private String email;
 
+    @Setter @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "skinType_id")
+    private SkinType skinType;
+
 //    private List<Cosmetic> cosmeticList;
 //    private List<Ingredient> preferIngrList;
 //    private List<Ingredient> dislikeIngrList;
-//    private String skinType;
 
 
     @Builder

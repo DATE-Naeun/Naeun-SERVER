@@ -21,13 +21,8 @@ public class SkinTypeApiController {
     public Result skinType(@RequestParam String skinType) {
         List<SkinType> findSkinType = skinType_service.findOneSkinType(skinType);
         List<SkinTypeDetailDto> collect = findSkinType.stream()
-                .map(s -> new SkinTypeDetailDto(
-                        s.getId(),
-                        s.getTypeName(),
-                        s.getDetail(),
-                        s.getStrongPoint(),
-                        s.getWeakPoint(),
-                        s.getCare())).collect(Collectors.toList());
+                .map(SkinTypeDetailDto::new)
+                .collect(Collectors.toList());
         return new Result(collect);
     }
 

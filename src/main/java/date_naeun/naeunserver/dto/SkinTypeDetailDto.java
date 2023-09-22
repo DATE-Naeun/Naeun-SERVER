@@ -15,12 +15,12 @@ public class SkinTypeDetailDto {
     private List<String> weak_point;
     private List<String> care;
 
-    public SkinTypeDetailDto(Long id, String typeName, String detail, List<String> strong_point, List<String> weak_point, List<String> care) {
-        this.id = id;
-        this.typeName = typeName;
-        this.detail = detail;
-        this.strong_point = strong_point;
-        this.weak_point = weak_point;
-        this.care = care;
+    public SkinTypeDetailDto(SkinType skinType) {
+        id = skinType.getId();
+        typeName = skinType.getTypeName();
+        detail = skinType.getDetail();
+        strong_point = skinType.getStrongPoint();
+        weak_point = skinType.getWeakPoint();
+        care = skinType.getCare();
     }
 }
