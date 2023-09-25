@@ -74,9 +74,12 @@ public class UserCosmeticApiController {
         User user = getUser(headers);
 
         // 사용자 id와 화장품 id 리스트
-        userCosmeticService.deleteCosmeticToUser(user, request.getDeletedCosmetic());
+        String responseMsg = userCosmeticService.deleteCosmeticToUser(user, request.getDeletedCosmetic());
 
-        return ResultDto.of(HttpStatus.OK, "나의 화장대 화장품 다중 삭제 성공", null);
+        if (responseMsg.equals("")) {
+            return ResultDto.of(HttpStatus.OK, "나의 화장대 화장품 다중 삭제 성공", null);
+        } else
+            return ResultDto.of(HttpStatus.BAD_REQUEST, responseMsg, null);
 
     }
 
