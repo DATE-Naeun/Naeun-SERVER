@@ -6,13 +6,19 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class CosmeticRepository {
 
+    @PersistenceContext
     private final EntityManager em;
+
+    public void save(Cosmetic cosmetic) {
+        em.persist(cosmetic);
+    }
 
     public Cosmetic findById(Long cosmeticId) {
         return em.find(Cosmetic.class, cosmeticId);
