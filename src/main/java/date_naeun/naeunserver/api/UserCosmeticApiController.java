@@ -39,11 +39,14 @@ public class UserCosmeticApiController {
         List<Cosmetic> findCosmetics = userCosmeticService.getCosmeticsForUser(user);
 
         // 엔티티 -> DTO 변환
-        List<CosmeticDto> collect = findCosmetics.stream()
-                .map(c -> new CosmeticDto(c.getId(), c.getName(), c.getBrand(), c.getImage()))
-                .collect(Collectors.toList());
-
-        return ResultDto.of(HttpStatus.OK, "나의 화장대 리스트 가져오기 성공", collect);
+        if (findCosmetics != null) {
+            List<CosmeticDto> collect = findCosmetics.stream()
+                    .map(c -> new CosmeticDto(c.getId(), c.getName(), c.getBrand(), c.getImage()))
+                    .collect(Collectors.toList());
+            return ResultDto.of(HttpStatus.OK, "나의 화장대 리스트 가져오기 성공", collect);
+        } else {
+            return ResultDto.of(HttpStatus.OK, "나의 화장대가 비어있습니다.", null);
+        }
     }
 
     /**
@@ -71,7 +74,7 @@ public class UserCosmeticApiController {
         User user = getUser(headers);
 
         // 사용자 id와 화장품 id 리스트
-        userCosmeticService.deleteCosmeticToUser(user, request.getCosmeticList());
+        userCosmeticService.deleteCosmeticToUser(user, request.getDeletedCosmetic());
 
         return ResultDto.of(HttpStatus.OK, "나의 화장대 화장품 다중 삭제 성공", null);
 
@@ -114,7 +117,7 @@ public class UserCosmeticApiController {
 
     @Data
     static class DeleteUserCosmeticRequest {
-        private List<Long> cosmeticList;
+        private List<Long> deletedCosmetic;
     }
 
 }
