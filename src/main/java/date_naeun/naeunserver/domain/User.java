@@ -35,9 +35,9 @@ public class User {
     private SkinType skinType;
 
     // 화장품의 id만 추가
-    @ElementCollection
+    @ElementCollection @Setter
     @CollectionTable(name = "user_cosmetic_list", joinColumns = @JoinColumn(name = "user_id"))
-    private final List<Long> userCosmeticList = new ArrayList<>();
+    private List<Long> userCosmeticList = new ArrayList<>();
 
 //    private List<Ingredient> preferIngrList;
 //    private List<Ingredient> dislikeIngrList;
