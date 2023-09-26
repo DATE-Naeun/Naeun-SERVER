@@ -44,4 +44,12 @@ public class UserRepository {
     public void delete(User user) {
         em.remove(user);
     }
+
+    public void updatePreferIngr(User user) {
+        em.merge(user);
+    }
+
+    public void updateDislikeIngr(User user) {
+        em.merge(user);
+    }
 }
