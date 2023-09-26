@@ -37,13 +37,7 @@ public class Cosmetic {
     @Column
     private Long price;
 
-//    @Column
-//    private List<Ingredient> ingredientList;
+    @Column
+    private List<Long> ingredientList;
 
-
-    public Cosmetic(Long id, String name, String brand) {
-        this.id = id;
-        this.name = name;
-        this.brand = brand;
-    }
 }
