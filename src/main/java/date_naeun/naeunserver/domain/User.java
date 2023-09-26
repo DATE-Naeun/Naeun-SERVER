@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 회원 엔티티
@@ -32,10 +34,16 @@ public class User {
     @JoinColumn(name = "skinType_id")
     private SkinType skinType;
 
-//    private List<Cosmetic> cosmeticList;
-//    private List<Ingredient> preferIngrList;
-//    private List<Ingredient> dislikeIngrList;
 
+    // 선호성분의 id만 추가
+    @ElementCollection @Setter
+    @CollectionTable(name = "user_prefer_ingr_list", joinColumns = @JoinColumn(name = "user_id"))
+    private List<Long> preferIngrList = new ArrayList<>();
+
+    // 기피성분의 id만 추가
+    @ElementCollection @Setter
+    @CollectionTable(name = "user_dislike_ingr_list", joinColumns = @JoinColumn(name = "user_id"))
+    private List<Long> dislikeIngrList = new ArrayList<>();
 
     @Builder
     public User(Long id, String name, String email) {
