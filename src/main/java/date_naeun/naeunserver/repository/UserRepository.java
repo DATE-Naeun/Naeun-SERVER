@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
 
+    @PersistenceContext
     private final EntityManager em;
 
 
@@ -43,5 +45,10 @@ public class UserRepository {
 
     public void delete(User user) {
         em.remove(user);
+    }
+
+    /* 변경한 user 를 DB에 반영하는 메서드 */
+    public void updateUserCosmetic(User user) {
+        em.merge(user);
     }
 }
