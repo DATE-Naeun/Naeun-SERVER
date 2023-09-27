@@ -1,11 +1,10 @@
 package date_naeun.naeunserver.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +37,16 @@ public class Cosmetic {
     private Long price;
 
     @Column
-    private List<Long> ingredientList;
+    @ElementCollection @Setter
+    @CollectionTable(name = "ingredient_list", joinColumns = @JoinColumn(name = "cosmetic_id"))
+    private List<Long> ingredientList = new ArrayList<>();
 
+    @Builder
+    public Cosmetic(String name, String brand, String image, String category, Long price) {
+        this.name = name;
+        this.brand = brand;
+        this.image = image;
+        this.category = category;
+        this.price = price;
+    }
 }
