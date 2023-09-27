@@ -7,6 +7,7 @@ import date_naeun.naeunserver.dto.CosmeticDetailDto;
 import date_naeun.naeunserver.dto.IngredientDetailDto;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.service.CosmeticService;
+import date_naeun.naeunserver.service.IngredientService;
 import date_naeun.naeunserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,7 @@ public class CosmeticDetailApiController {
 
     private final UserService userService;
     private final CosmeticService cosmeticService;
+    private final IngredientService ingrService;
 
     /**
      * 화장품 상세 페이지
@@ -39,7 +41,7 @@ public class CosmeticDetailApiController {
         Cosmetic cosmetic = cosmeticService.getCosmeticInfo(cosmeticId);
 
         // 성분리스트 가져오기
-        List<Ingredient> ingreList = cosmeticService.findIngreList(cosmetic);
+        List<Ingredient> ingreList = ingrService.findIngrList(cosmetic);
 
         if (ingreList == null) {
             return ResultDto.of(HttpStatus.OK, "성분 리스트가 비어 있습니다.", null);
