@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,12 +28,15 @@ public class IngredientApiController {
     private final IngredientService ingr_service;
 
     @GetMapping("/api/ingredient/search")
-    public ResultDto<List<IngredientDetailDto>> ingr(@RequestParam String keyword) {
+    public ResultDto<Map<String, Object>> ingr(@RequestParam String keyword) {
         List<Ingredient> findIngr = ingr_service.findOneIngr(keyword);
         List<IngredientDetailDto> collect = findIngr.stream()
                 .map(IngredientDetailDto::new)
                 .collect(Collectors.toList());
-        return ResultDto.of(HttpStatus.OK, "성분 검색 결과 가져오기 성공", collect);
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("ingredients", collect);
+        return ResultDto.of(HttpStatus.OK, "성분 검색 결과 가져오기 성공", responseData);
     }
 
     /**
@@ -48,10 +53,13 @@ public class IngredientApiController {
             List<IngredientDetailDto> collect = findUserIngr.stream()
                     .map(IngredientDetailDto::new)
                     .collect(Collectors.toList());
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("ingredients", collect);
             if(isPreference) {
-                return ResultDto.of(HttpStatus.OK, "사용자의 선호성분 가져오기 성공", collect);
+                return ResultDto.of(HttpStatus.OK, "사용자의 선호성분 가져오기 성공", responseData);
             } else {
-                return ResultDto.of(HttpStatus.OK, "사용자의 기피성분 가져오기 성공", collect);
+                return ResultDto.of(HttpStatus.OK, "사용자의 기피성분 가져오기 성공", responseData);
             }
         } else {
             if(isPreference) {

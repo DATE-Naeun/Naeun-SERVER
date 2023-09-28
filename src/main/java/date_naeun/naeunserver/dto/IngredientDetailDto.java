@@ -8,16 +8,16 @@ import java.util.List;
 @Data
 public class IngredientDetailDto {
 
-    private Long id;
-    private String ingr_name;
+    private Long ingredientId;
+    private String ingredientName;
 
-    private List<String> active_detail;
-    private List<String> harm_detail;
+    private List<String> activeDetail;
+    private List<String> harmfulDetail;
 
     public IngredientDetailDto(Ingredient ingr) {
-        id = ingr.getId();
-        ingr_name = ingr.getIngr_name();
-        active_detail = ingr.getActive_detail();
-        harm_detail = ingr.getHarm_detail();
+        ingredientId = ingr.getId();
+        ingredientName = ingr.getIngr_name();
+        activeDetail = ingr.getActive_detail();
+        harmfulDetail = ingr.getHarm_detail();
     }
 }
