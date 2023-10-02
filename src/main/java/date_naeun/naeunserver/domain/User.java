@@ -39,9 +39,16 @@ public class User {
     @CollectionTable(name = "user_cosmetic_list", joinColumns = @JoinColumn(name = "user_id"))
     private List<Long> userCosmeticList = new ArrayList<>();
 
-//    private List<Ingredient> preferIngrList;
-//    private List<Ingredient> dislikeIngrList;
 
+    // 선호성분의 id만 추가
+    @ElementCollection @Setter
+    @CollectionTable(name = "user_prefer_ingr_list", joinColumns = @JoinColumn(name = "user_id"))
+    private List<Long> preferIngrList = new ArrayList<>();
+
+    // 기피성분의 id만 추가
+    @ElementCollection @Setter
+    @CollectionTable(name = "user_dislike_ingr_list", joinColumns = @JoinColumn(name = "user_id"))
+    private List<Long> dislikeIngrList = new ArrayList<>();
 
     @Builder
     public User(Long id, String name, String email) {

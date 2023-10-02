@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 public class IngredientDetailDto {
 
-    private Long id;
-    private String ingr_name;
+    private Long ingredientId;
+    private String ingredientName;
 
     // TO DO: List<Long> -> List<String>으로 바꾸기(id 값 리스트로 detail 이름 리스트 가져오기)
     private List<Long> active_detail;
