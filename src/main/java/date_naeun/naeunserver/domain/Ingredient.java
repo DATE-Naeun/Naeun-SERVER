@@ -22,12 +22,11 @@ public class Ingredient {
 
     @Setter
     @ElementCollection
-    @CollectionTable(name = "ingr_active_detail", joinColumns = @JoinColumn(name = "ingr_id"))
-    private List<String> active_detail;
+    @CollectionTable(name = "ingr_active_detail", joinColumns = @JoinColumn(name = "active_id"))
+    private List<Long> active_detail_id;
 
     @Setter
     @ElementCollection
-    @CollectionTable(name = "ingr_harm_detail", joinColumns = @JoinColumn(name = "ingr_id"))
-    private List<String> harm_detail;
-
+    @CollectionTable(name = "ingr_harm_detail", joinColumns = @JoinColumn(name = "harm_id"))
+    private List<Long> harm_detail_id;
 }

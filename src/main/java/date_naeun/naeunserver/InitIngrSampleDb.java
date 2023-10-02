@@ -34,11 +34,11 @@ public class InitIngrSampleDb {
         public void dbInit() {
             Ingredient tea_tree =createIngr("티트리꽃/잎/줄기추출물",null,null);
             em.persist(tea_tree);
-            Ingredient tea_tree_oil = createIngr("티트리잎오일",new ArrayList<>(Arrays.asList("피부 손상 방지")),null);
+            Ingredient tea_tree_oil = createIngr("티트리잎오일",new ArrayList<>(Arrays.asList(1L)),null);
             em.persist(tea_tree_oil);
-            Ingredient tea_tree_leaf_extract = createIngr("티트리잎추출물",new ArrayList<>(Arrays.asList("자극 완화","피부 진정-o","피지 분비 감소","트러블 진정","항염 효과")),null);
+            Ingredient tea_tree_leaf_extract = createIngr("티트리잎추출물",new ArrayList<>(Arrays.asList(11L, 16L, 10L, 13L, 12L)),null);
             em.persist(tea_tree_leaf_extract);
-            Ingredient tea_tree_extract = createIngr("티트리추출물",new ArrayList<>(Arrays.asList("각질 감소")),null);
+            Ingredient tea_tree_extract = createIngr("티트리추출물",new ArrayList<>(Arrays.asList(9L)),null);
             em.persist(tea_tree_extract);
             Ingredient mg_glu = createIngr("마그네슘글루코네이트",null,null);
             em.persist(mg_glu);
@@ -72,14 +72,14 @@ public class InitIngrSampleDb {
     }
 
     static private Ingredient createIngr(String ingr_name,
-                                         List<String> active_detail,
-                                         List<String> harm_detail) {
-        Ingredient ingr = new Ingredient();
-        ingr.setIngr_name(ingr_name);
-        ingr.setActive_detail(active_detail);
-        ingr.setHarm_detail(harm_detail);
+                                         List<Long> active_detail_id,
+                                         List<Long> harm_detail_id) {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setIngr_name(ingr_name);
+        ingredient.setActive_detail_id(active_detail_id);
+        ingredient.setHarm_detail_id(harm_detail_id);
 
-        return ingr;
+        return ingredient;
     }
 
     static private Cosmetic createCsmt(String name, String brand, Long price, String rating, String reviews) {
