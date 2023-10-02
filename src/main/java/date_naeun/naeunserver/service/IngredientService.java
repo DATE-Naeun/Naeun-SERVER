@@ -158,6 +158,7 @@ public class IngredientService {
             if (dislikeIngrIds.isEmpty()) return null;
             return ingr_repository.findAllById(dislikeIngrIds);
         }
+    }
 
     /* 화장품 성분 리스트를 가져오는 메서드 */
     public List<Ingredient> findIngrList(Cosmetic cosmetic) {
@@ -166,6 +167,6 @@ public class IngredientService {
 
         if (ingreIds.isEmpty()) return null;
 
-        return ingr_repository.findALlById(ingreIds);
+        return ingr_repository.findAllById(ingreIds);
     }
 }
