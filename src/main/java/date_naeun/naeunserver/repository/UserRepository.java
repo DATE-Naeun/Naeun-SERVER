@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
-
+  
     @PersistenceContext
     private final EntityManager em;
 
@@ -45,6 +45,14 @@ public class UserRepository {
 
     public void delete(User user) {
         em.remove(user);
+    }
+
+    public void updatePreferIngr(User user) {
+        em.merge(user);
+    }
+
+    public void updateDislikeIngr(User user) {
+        em.merge(user);
     }
 
     /* 변경한 user 를 DB에 반영하는 메서드 */

@@ -39,16 +39,15 @@ public class IngredientRepository {
                 .getResultList();
     }
 
-    public List<Ingredient> findALlById(List<Long> ingreList) {
-        List<Ingredient> ingredients =  em.createQuery("SELECT i FROM Ingredient i WHERE i.id IN :ingreList", Ingredient.class)
-                .setParameter("ingreList", ingreList)
+    public List<Ingredient> findAllById(List<Long> ingrList) {
+        List<Ingredient> ingredients = em.createQuery("select i from Ingredient i where i.id IN :ingrList", Ingredient.class)
+                .setParameter("ingrList", ingrList)
                 .getResultList();
 
         if (ingredients.isEmpty()) {
             throw new EntityNotFoundException("해당 id의 성분을 찾을 수 없습니다.");
         }
         return ingredients;
-
     }
 
 }
