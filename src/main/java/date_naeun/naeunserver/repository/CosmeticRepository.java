@@ -34,4 +34,10 @@ public class CosmeticRepository {
         }
         return cosmetics;
     }
+
+    public List<Cosmetic> findByKeyword(String name) {
+        return em.createQuery("select c from Cosmetic c where c.name LIKE CONCAT('%', :name, '%') OR c.brand LIKE CONCAT('%', :name, '%')", Cosmetic.class)
+                .setParameter("name", name)
+                .getResultList();
+    }
 }
