@@ -1,5 +1,6 @@
 package date_naeun.naeunserver.repository;
 
+import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -48,4 +49,5 @@ public class IngredientRepository {
         }
         return ingredients;
     }
+
 }

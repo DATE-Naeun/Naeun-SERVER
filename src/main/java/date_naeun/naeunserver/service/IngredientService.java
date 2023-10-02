@@ -1,5 +1,6 @@
 package date_naeun.naeunserver.service;
 
+import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.repository.IngredientRepository;
@@ -157,5 +158,14 @@ public class IngredientService {
             if (dislikeIngrIds.isEmpty()) return null;
             return ingr_repository.findAllById(dislikeIngrIds);
         }
+
+    /* 화장품 성분 리스트를 가져오는 메서드 */
+    public List<Ingredient> findIngrList(Cosmetic cosmetic) {
+        // Cosmetic 엔티티로부터 성분 ID 목록을 얻음
+        List<Long> ingreIds = cosmetic.getIngredientList();
+
+        if (ingreIds.isEmpty()) return null;
+
+        return ingr_repository.findALlById(ingreIds);
     }
 }
