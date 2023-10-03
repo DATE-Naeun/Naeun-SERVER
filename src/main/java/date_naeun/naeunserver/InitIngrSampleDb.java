@@ -56,17 +56,17 @@ public class InitIngrSampleDb {
         private final EntityManager em;
 
         public void dbInitCsmt() {
-            Cosmetic a = createCsmt("레드 블레미쉬", "닥터지", 26400L, "4.53","1245");
+            Cosmetic a = createCsmt("레드 블레미쉬", "닥터지", "26400", "4.53","1245");
             em.persist(a);
-            Cosmetic b = createCsmt("어쩔체리 틴트", "페리페라", 12000L, "4.11","789");
+            Cosmetic b = createCsmt("어쩔체리 틴트", "페리페라", "12000", "4.11","789");
             em.persist(b);
-            Cosmetic c = createCsmt("하트 섀도우", "페리페라", 24000L, "4.22","162");
+            Cosmetic c = createCsmt("하트 섀도우", "페리페라", "24000", "4.22","162");
             em.persist(c);
-            Cosmetic d = createCsmt("그린 마일드 업 선 플러스", "닥터지", 15000L, "4.81","541");
+            Cosmetic d = createCsmt("그린 마일드 업 선 플러스", "닥터지", "15000", "4.81","541");
             em.persist(d);
-            Cosmetic e = createCsmt("네오쿠션", "라네즈", 32000L, "4.57","3429");
+            Cosmetic e = createCsmt("네오쿠션", "라네즈", "32000", "4.57","3429");
             em.persist(e);
-            Cosmetic f = createCsmt("킬커버쿠션", "클리오", 34000L, "4.42","3421");
+            Cosmetic f = createCsmt("킬커버쿠션", "클리오", "34000", "4.42","3421");
             em.persist(f);
         }
     }
@@ -82,7 +82,7 @@ public class InitIngrSampleDb {
         return ingredient;
     }
 
-    static private Cosmetic createCsmt(String name, String brand, Long price, String rating, String reviews) {
+    static private Cosmetic createCsmt(String name, String brand, String price, String rating, String reviews) {
         Cosmetic cosmetic = new Cosmetic();
         cosmetic.setName(name);
         cosmetic.setBrand(brand);
