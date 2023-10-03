@@ -32,7 +32,7 @@ public class InitCosmeticSampleDb {
                     .name("리얼 시카 카밍 95 크림")
                     .brand("웰라쥬")
                     .image("https://m.wellage.co.kr/web/product/extra/big/202109/3180f25ee5a054775a127372342b852e.jpg")
-                    .price(21000L)
+                    .price("21000")
                     .build();
 
             List<Long> ingreList = new ArrayList<>();

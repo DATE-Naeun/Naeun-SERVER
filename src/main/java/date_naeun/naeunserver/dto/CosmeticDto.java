@@ -10,7 +10,7 @@ public class CosmeticDto {
     private String cosmeticName;
     private String brand;
     private String image;
-    private Long price;
+    private String price;
     private String rating;
     private String reviews;
 

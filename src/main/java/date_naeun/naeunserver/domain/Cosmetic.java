@@ -37,7 +37,7 @@ public class Cosmetic {
     private String category;
 
     @Column @Setter
-    private Long price;
+    private String price;
 
     @Column @Setter
     private String rating;
@@ -51,7 +51,7 @@ public class Cosmetic {
     private List<Long> ingredientList = new ArrayList<>();
 
     @Builder
-    public Cosmetic(String name, String brand, String image, String category, Long price) {
+    public Cosmetic(String name, String brand, String image, String category, String price) {
         this.name = name;
         this.brand = brand;
         this.image = image;
