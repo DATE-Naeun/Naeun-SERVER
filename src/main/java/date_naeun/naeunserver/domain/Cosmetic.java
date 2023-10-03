@@ -3,8 +3,11 @@ package date_naeun.naeunserver.domain;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
@@ -21,10 +24,10 @@ public class Cosmetic {
     @Column
     private Long id;
 
-    @Column
+    @Column @Setter
     private String name;
 
-    @Column
+    @Column @Setter
     private String brand;
 
     @Column
@@ -33,8 +36,14 @@ public class Cosmetic {
     @Column
     private String category;
 
-    @Column
+    @Column @Setter
     private Long price;
+
+    @Column @Setter
+    private String rating;
+
+    @Column @Setter
+    private String reviews;
 
     @Column
     @ElementCollection @Setter
@@ -50,3 +59,4 @@ public class Cosmetic {
         this.price = price;
     }
 }
+
