@@ -7,13 +7,13 @@ import lombok.Data;
  * 비교기록 화장품 Dto
  */
 @Data
-public class ComparisonCosmeticDto {
+public class HistoryCosmeticDto {
     private Long cosmeticId;
     private String cosmeticName;
     private String cosmeticBrand;
     private String image;
 
-    public ComparisonCosmeticDto(Cosmetic cosmetic) {
+    public HistoryCosmeticDto(Cosmetic cosmetic) {
         this.cosmeticId = cosmetic.getId();
         this.cosmeticName = cosmetic.getName();
         this.cosmeticBrand = cosmetic.getBrand();

@@ -14,9 +14,9 @@ public class HistoryDto {
 
     private Long comparisonId;
     private Date comparisonDate;
-    private List<ComparisonCosmeticDto> cosmeticList;
+    private List<HistoryCosmeticDto> cosmeticList;
 
-    public HistoryDto(History history, List<ComparisonCosmeticDto> cosmeticDtos) {
+    public HistoryDto(History history, List<HistoryCosmeticDto> cosmeticDtos) {
         this.comparisonId = history.getId();
         this.comparisonDate = history.getDate();
         this.cosmeticList = cosmeticDtos;

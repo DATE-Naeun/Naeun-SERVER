@@ -13,7 +13,6 @@ import java.util.List;
 @Table(name = "History")
 @NoArgsConstructor
 public class History {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,8 +21,8 @@ public class History {
     private Date date;
 
     // 비교한 화장품 리스트
-    @ElementCollection
-    @CollectionTable(name = "comparison_cosmetic_list", joinColumns = @JoinColumn(name = "cosmetic_id"))
+    @ElementCollection @Setter
+    @CollectionTable(name = "history_cosmetic_list", joinColumns = @JoinColumn(name = "history_id"))
     private List<Long> cosmeticList;
 
     public History(Date date, List<Long> cosmeticList) {
