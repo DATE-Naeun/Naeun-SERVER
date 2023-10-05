@@ -26,6 +26,7 @@ public class JwtProvider {
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
+    private CustomUserDetailService userDetailService;
 
     /**
      *  인증된 사용자에게 최초 발급할 Access Token 생성
@@ -56,6 +57,40 @@ public class JwtProvider {
                 .setExpiration(Date.from(now.plusMillis(refreshTokenValidationTime)))
                 .signWith(key)
                 .compact();
+    }
+
+    /**
+     * UsernamePasswordAuthenticationToken으로 보내 인증된 유저인지 확인
+     */
+    public Authentication getAuthentication(String accessToken) throws ExpiredJwtException {
+        Claims claims = getTokenBody(accessToken);
+        // email로 UserDetail 가져오기
+        CustomUserDetail userDetail = userDetailService.loadUserByUsername(claims.getSubject());
+
+        return new UsernamePasswordAuthenticationToken(userDetail, "", userDetail.getAuthorities());
+    }
+
+    /**
+     *토큰 유효성 검사
+     */
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.info("잘못된 JWT 서명입니다.");
+        } catch (ExpiredJwtException e) {
+            log.info("만료된 JWT 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            log.info("지원되지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            log.info("JWT 토큰이 잘못되었습니다.");
+        }
+        return false;
+    }
+
+    private Claims getTokenBody(String jwtToken) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwtToken).getBody();
     }
 
 }
