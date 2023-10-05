@@ -1,6 +1,6 @@
 package date_naeun.naeunserver.api;
 
-import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.config.jwt.TokenDto;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.external.client.kakao.service.KakaoUserService;
@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 
-
+/**
+ * 카카오 소셜 회원가입/로그인 API
+ */
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -29,11 +31,15 @@ public class SocialLoginApiController {
 
         // token으로 카카오 사용자 정보 가져오기
         KakaoUserInfo kakaoUserInfo = kakaoUserService.getKakaoUserInfo(accessToken);
-        User user = kakaoUserService.joinorLogin(kakaoUserInfo);
 
-        // JWT 토큰 발급
+        // 회원가입/로그인 후 JWT 토큰 발급
+        TokenDto tokenDto = kakaoUserService.joinorLogin(kakaoUserInfo);
 
-        return ResultDto.of(HttpStatus.OK, "signup or login", user);
+        if (tokenDto.getType().equals("Signup")) {
+            return ResultDto.of(HttpStatus.CREATED, "회원 가입 성공", tokenDto);
+        } else {
+            return ResultDto.of(HttpStatus.CREATED, "로그인 성공", tokenDto);
+        }
     }
 
 }

@@ -50,11 +50,15 @@ public class User {
     @CollectionTable(name = "user_dislike_ingr_list", joinColumns = @JoinColumn(name = "user_id"))
     private List<Long> dislikeIngrList = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private Role role;  // 사용자 권한
+
     @Builder
     public User(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.role = Role.USER;
     }
 }
 

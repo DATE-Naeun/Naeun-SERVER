@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import date_naeun.naeunserver.config.jwt.JwtProvider;
+import date_naeun.naeunserver.config.jwt.TokenDto;
+import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.repository.UserRepository;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -25,6 +29,7 @@ import java.util.Map;
 public class KakaoUserService {
 
     private final UserRepository userRepository;
+    private final JwtProvider jwtProvider;
 
     /**
      * 카카오 액세스 토큰으로 카카오 사용자 정보 받아오는 메서드
@@ -72,15 +77,16 @@ public class KakaoUserService {
      * 회원 가입/로그인 후 사용자 반환
      * - 이메일로 DB에 존재하는 회원인지 조회
      */
-    public User joinorLogin(KakaoUserInfo kakaoUserInfo) {
+    public TokenDto joinorLogin(KakaoUserInfo kakaoUserInfo) {
         String email = kakaoUserInfo.getEmail();
         User user = userRepository.findByEmail(email);
 
         if (user == null) {
-            return join(kakaoUserInfo);
+            // 회원 가입 후 토큰 발급
+            return createTokens(join(kakaoUserInfo), "Signup");
         }
 
-        return user;
+        return createTokens(user, "Login");
     }
 
     /**
@@ -95,5 +101,41 @@ public class KakaoUserService {
         userRepository.save(newUser);
         log.info("join 성공 = {}", newUser.getName());
         return newUser;
+    }
+
+    /**
+     * JWT토큰 발급
+     *@paramuser: 현재 로그인한 user
+     *@paramtype: signup / login
+     */
+    private TokenDto createTokens(User user, String type) {
+        // Access Token 생성
+        log.info("Token 생성 시작");
+        String accessToken = delegateAccessToken(user.getEmail(), user.getRole());
+        log.info("Access Token = {}", accessToken);
+
+        // Refresh Token 생성
+        String refreshToken = delegateRefreshToken(user.getEmail());
+        log.info("Refresh Token = {}", refreshToken);
+
+        return new TokenDto(type, accessToken, refreshToken);
+    }
+
+    /**
+     *  Access Token 생성
+     */
+    private String delegateAccessToken(String email, Role role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", email); // Principal
+        claims.put("role", role);
+
+        return jwtProvider.generateAccessToken(claims, email);
+    }
+
+    /**
+     *  Refresh Token 생성
+     */
+    private String delegateRefreshToken(String email) {
+        return jwtProvider.generateRefreshToken(email);
     }
 }
