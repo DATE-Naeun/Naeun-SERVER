@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 
 /**
  * 카카오 소셜 회원가입/로그인 API
@@ -26,7 +28,7 @@ public class SocialLoginApiController {
     @PostMapping("/api/auth/social")
     public ResultDto<Object> socialLogin(@RequestHeader HttpHeaders headers) {
 
-        String accessToken = headers.getFirst("accessToken");
+        String accessToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
         log.info("access Token = {}", accessToken);
 
         // token으로 카카오 사용자 정보 가져오기
