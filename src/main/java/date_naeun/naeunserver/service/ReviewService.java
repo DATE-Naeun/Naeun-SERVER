@@ -1,13 +1,16 @@
 package date_naeun.naeunserver.service;
 
+import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Review;
-import date_naeun.naeunserver.domain.SkinType;
 import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.dto.ReviewRequestDto;
+import date_naeun.naeunserver.repository.CosmeticRepository;
 import date_naeun.naeunserver.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository review_repository;
+    private final CosmeticRepository csmt_repository;
 
 
     /**
@@ -137,5 +141,50 @@ public class ReviewService {
         return ((double) repurchaseCount / totalReviews) * 100.0;
     }
 
+    /**
+     * 리뷰 등록
+     */
+    @Transactional
+    public void addCosmeticReview(User user, ReviewRequestDto requestDto) {
+        Review review = new Review();
 
+        review.setRating(requestDto.getRating());
+        review.setOpen(requestDto.isOpen());
+        review.setContent(requestDto.getContent());
+        review.setTexture(requestDto.getTexture());
+        review.setRepurchase(requestDto.getRepurchase());
+        review.setImage(requestDto.getPhoto());
+
+        // 현재 시각을 등록 시각으로 설정
+        review.setDate(new Date());
+
+        // 작성자 정보를 설정
+        review.setUser(user);
+
+        // 작성된 리뷰를 화장품과 연결
+        Cosmetic cosmetic = csmt_repository.findById(requestDto.getCosmeticId());
+        review.setCosmetic(cosmetic);
+
+        review_repository.save(review);
+
+        /**
+         * 리뷰 등록이 완료되면 해당 화장품의 리뷰 개수와 평점평균 갱신
+         */
+        // 리뷰를 포함한 해당 화장품의 모든 리뷰들 가져오기
+        List<Review> reviews = review_repository.findByCosmeticId(cosmetic.getId());
+
+        // 리뷰 수와 총 평점 계산
+        int totalReviews = reviews.size();
+        double totalRating = reviews.stream()
+                        .mapToDouble(Review::getRating)
+                        .sum();
+        // 새로운 평균평점 계산
+        String newRatingAvg = String.valueOf(totalRating / totalReviews);
+
+
+        // 화장품에 새로운 평균평점 설정
+        cosmetic.setRating(newRatingAvg);
+        cosmetic.setReviews(String.valueOf(totalReviews));
+
+    }
 }
