@@ -28,7 +28,7 @@
 
         private static final Long accessTokenValidationTime = 30 * 60 * 1000L;   //30분
 
-        private static final Long refreshTokenValidationTime = 7 * 24 * 60 * 60 * 1000L;  //7일
+        private static final Long refreshTokenValidationTime = 7 * 24 * 60 * 60 * 1000 * 3L;  // 3주
 
         private final CustomUserDetailService userDetailService;
 
@@ -59,11 +59,12 @@
          * Refresh Token 생성 메서드
          * - Access Token이 만료되었을 경우 생성
          */
-        public String generateRefreshToken(String subject) {
+        public String generateRefreshToken(Map<String, Object> claims, String subject) {
             //토큰 생성시간
             Instant now = Instant.from(OffsetDateTime.now());
 
             return Jwts.builder()
+                    .setClaims(claims)
                     .setSubject(subject)
                     .setExpiration(Date.from(now.plusMillis(refreshTokenValidationTime)))
                     .signWith(secretKey)
@@ -97,6 +98,11 @@
                 log.info("JWT 토큰이 잘못되었습니다.");
             }
             return false;
+        }
+
+        public String regenerateToken(String token) {
+            Claims claims = getTokenBody(token);
+            return generateAccessToken(claims, claims.getSubject());
         }
 
         /**

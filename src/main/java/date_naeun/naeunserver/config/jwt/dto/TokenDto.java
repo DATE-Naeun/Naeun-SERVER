@@ -1,8 +1,7 @@
-package date_naeun.naeunserver.config.jwt;
+package date_naeun.naeunserver.config.jwt.dto;
 
 import lombok.*;
 
-import java.time.Duration;
 
 @Data
 @NoArgsConstructor

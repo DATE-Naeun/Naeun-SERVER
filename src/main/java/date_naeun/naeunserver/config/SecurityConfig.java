@@ -33,11 +33,12 @@ public class SecurityConfig {
 
                 /*
                  * HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정
-                 * - 카카오 계정으로 처음으로 회원가입/로그인 할 때에만 모든 접근 허용
+                 * - 회원가입/로그인 또는 토큰 재발급 요청 시 모든 접근 허용
                  */
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/social").permitAll()    // 모든 접근 허용
+                .antMatchers("/api/auth/getnewtoken").permitAll()
                 .antMatchers("/api/**").authenticated()     // 인증만 되면 들어갈 수 있는 주소
                 .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")   // 관리자만 접속 가능한 주소
                 .anyRequest().authenticated()  // 이외에는 접근 권한 필요

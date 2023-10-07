@@ -5,11 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import date_naeun.naeunserver.config.jwt.JwtProvider;
-import date_naeun.naeunserver.config.jwt.TokenDto;
+import date_naeun.naeunserver.config.jwt.dto.TokenDto;
 import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -68,7 +69,7 @@ public class KakaoUserService {
             e.printStackTrace();
         }
 
-        if (originAttributes == null) throw new NullPointerException("카카오 사용자 정보 받아오기 실패");
+        if (originAttributes == null) throw new NullPointerException("소셜로그인 회원 정보 조회 실패");
 
         return new KakaoUserInfo(originAttributes);
     }
@@ -115,7 +116,7 @@ public class KakaoUserService {
         log.info("Access Token = {}", accessToken);
 
         // Refresh Token 생성
-        String refreshToken = delegateRefreshToken(user.getEmail());
+        String refreshToken = delegateRefreshToken(user.getId(), user.getEmail(), user.getRole());
         log.info("Refresh Token = {}", refreshToken);
 
         return new TokenDto(type, accessToken, refreshToken);
@@ -134,7 +135,17 @@ public class KakaoUserService {
     /**
      *  Refresh Token 생성
      */
-    private String delegateRefreshToken(String email) {
-        return jwtProvider.generateRefreshToken(email);
+    private String delegateRefreshToken(Long id, String email, Role role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", id);
+        claims.put("role", role);
+        return jwtProvider.generateRefreshToken(claims, email);
+    }
+
+    public String regenerateToken(String refreshToken) {
+        if (jwtProvider.validateToken(refreshToken)) {
+            return jwtProvider.regenerateToken(refreshToken);
+        }
+        return "";
     }
 }
