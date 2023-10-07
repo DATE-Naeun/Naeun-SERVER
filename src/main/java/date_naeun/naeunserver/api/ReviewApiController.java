@@ -1,16 +1,24 @@
 package date_naeun.naeunserver.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import date_naeun.naeunserver.domain.Review;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.dto.ReviewDetailDto;
+import date_naeun.naeunserver.dto.ReviewRequestDto;
 import date_naeun.naeunserver.service.ReviewService;
 import date_naeun.naeunserver.service.UserService;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +59,16 @@ public class ReviewApiController {
         responseData.put("reviews", collect);
         return ResultDto.of(HttpStatus.OK, "화장품 리뷰 가져오기 성공", responseData);
     }
+
+    @PostMapping("/api/cosmetic/review")
+    public ResultDto<Object> createCosmeticReview(@RequestHeader HttpHeaders headers,
+                                                  @RequestBody @Valid ReviewRequestDto requestDto) {
+        User user = getUser(headers);
+        reviewService.addCosmeticReview(user, requestDto);
+        System.out.println(requestDto);
+        return ResultDto.of(HttpStatus.OK, "리뷰 작성하기 성공", null);
+    }
+
 
     private User getUser(HttpHeaders headers) {
         String accessToken = headers.getFirst("accessToken");
