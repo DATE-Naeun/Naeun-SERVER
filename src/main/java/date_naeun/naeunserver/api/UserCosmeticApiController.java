@@ -1,5 +1,6 @@
 package date_naeun.naeunserver.api;
 
+import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.ResultDto;
@@ -9,10 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * 나의 화장대 API
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserCosmeticApiController {
@@ -32,9 +36,10 @@ public class UserCosmeticApiController {
      * 나의 화장대 조회
      */
     @GetMapping("/api/cosmetic/user")
-    public ResultDto<Object> getUserCosmetic(@RequestHeader HttpHeaders headers) {
+    public ResultDto<Object> getUserCosmetic(@AuthenticationPrincipal CustomUserDetail userDetail) {
 
-        User user = getUser(headers);
+        // 현재 로그인한 유저
+        User user = getUser(userDetail);
 
         List<Cosmetic> findCosmetics = userCosmeticService.getCosmeticsForUser(user);
 
@@ -53,10 +58,10 @@ public class UserCosmeticApiController {
      * 나의 화장대에 추가
      */
     @PostMapping("/api/cosmetic/user")
-    public ResultDto<Object> createUserCosmetic(@RequestHeader HttpHeaders headers, @RequestBody @Valid AddUserCosmeticRequest request) {
+    public ResultDto<Object> createUserCosmetic(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid AddUserCosmeticRequest request) {
 
-        // Request Header에서 accessToken 값을 추출
-        User user = getUser(headers);
+        // 현재 로그인한 유저
+        User user = getUser(userDetail);
 
         // 사용자 id와 화장품 id
         userCosmeticService.addCosmeticToUser(user, request.getCosmeticId());
@@ -68,10 +73,10 @@ public class UserCosmeticApiController {
      * 나의 화장대에서 삭제
      */
     @PutMapping("/api/cosmetic/user")
-    public ResultDto<Object> deleteUserCosmetic(@RequestHeader HttpHeaders headers, @RequestBody @Valid DeleteUserCosmeticRequest request) {
+    public ResultDto<Object> deleteUserCosmetic(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid DeleteUserCosmeticRequest request) {
 
-        // Request Header에서 accessToken 값을 추출
-        User user = getUser(headers);
+        // 현재 로그인한 유저
+        User user = getUser(userDetail);
 
         // 사용자 id와 화장품 id 리스트
         String responseMsg = userCosmeticService.deleteCosmeticToUser(user, request.getDeletedCosmetic());
@@ -84,18 +89,14 @@ public class UserCosmeticApiController {
     }
 
     /**
-     * To Do
-     * - JWT 토큰으로 사용자 id 가져오는 로직 구현
+     * JWT 토큰으로 사용자를 받아오는 메서드
      */
-    /* access Token 으로 사용자를 받아오는 메서드 */
-    private User getUser(HttpHeaders headers) {
-        // Request Header에서 accessToken 값을 추출
-        String accessToken = headers.getFirst("accessToken");
-        System.out.println(accessToken);
-        // accessToken 유효성 검사: accessToken을 검증하고 사용자 ID를 추출하는 로직 구현
-
-        Long userId = 1L;
-        return userService.findUserById(userId);        // 액세스 토큰을 사용하여 사용자 id 조회
+    private User getUser(CustomUserDetail userDetail) {
+        if (userDetail == null) {
+            throw new EntityNotFoundException("해당 토큰으로 사용자를 조회할 수 없습니다.");
+        }
+        // accessToken 검증 후 생성된 userDetail의 id로 user 찾아서 생성
+        return userService.findUserById(userDetail.getId());
     }
 
     @Data
