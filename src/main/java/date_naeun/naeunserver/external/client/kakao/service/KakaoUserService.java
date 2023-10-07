@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
+import date_naeun.naeunserver.config.jwt.exception.AuthErrorException;
+import date_naeun.naeunserver.config.jwt.exception.AuthErrorStatus;
+import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
+import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
 import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -69,7 +72,7 @@ public class KakaoUserService {
             e.printStackTrace();
         }
 
-        if (originAttributes == null) throw new NullPointerException("소셜로그인 회원 정보 조회 실패");
+        if (originAttributes == null) throw new AuthErrorException(AuthErrorStatus.GETUSER_FAILED);
 
         return new KakaoUserInfo(originAttributes);
     }
@@ -143,6 +146,9 @@ public class KakaoUserService {
     }
 
     public String regenerateToken(String refreshToken) {
+        if (jwtProvider.verifyExpireMin(refreshToken)) {
+            throw new TokenErrorException(TokenStatus.REFRESH_EXPIRED);
+        }
         if (jwtProvider.validateToken(refreshToken)) {
             return jwtProvider.regenerateToken(refreshToken);
         }

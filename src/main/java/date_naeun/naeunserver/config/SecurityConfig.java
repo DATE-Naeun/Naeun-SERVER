@@ -1,5 +1,6 @@
 package date_naeun.naeunserver.config;
 
+import date_naeun.naeunserver.config.jwt.JwtExceptionFilter;
 import date_naeun.naeunserver.config.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -26,6 +28,7 @@ public class SecurityConfig {
 
                 /* 컨트롤러 수행 전에 jwt 토큰 검사 먼저 진행 */
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtExceptionFilter, JwtRequestFilter.class)
 
                 /* 세션 사용하지 않음 */
                 .sessionManagement()

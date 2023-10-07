@@ -1,5 +1,7 @@
     package date_naeun.naeunserver.config.jwt;
 
+    import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
+    import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
     import io.jsonwebtoken.*;
     import io.jsonwebtoken.security.Keys;
     import lombok.RequiredArgsConstructor;
@@ -89,13 +91,13 @@
                 Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
                 return true;
             } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-                log.info("잘못된 JWT 서명입니다.");
+                throw new TokenErrorException(TokenStatus.INVALID_TOKEN); // 잘못된 토큰
             } catch (ExpiredJwtException e) {
-                log.info("만료된 JWT 토큰입니다.");
+                throw new TokenErrorException(TokenStatus.EXPIRED_TOKEN); // 만료된 토큰
             } catch (UnsupportedJwtException e) {
-                log.info("지원되지 않는 JWT 토큰입니다.");
+                log.error("지원되지 않는 토큰입니다.");
             } catch (IllegalArgumentException e) {
-                log.info("JWT 토큰이 잘못되었습니다.");
+                log.error("잘못된 JWT 토큰입니다.");
             }
             return false;
         }
@@ -108,16 +110,10 @@
         /**
          * JWT 토큰 만료시간 검증
          */
-        public void verifyExpireMin(String token) throws Exception {
-            boolean before = getTokenBody(token)
+        public boolean verifyExpireMin(String token) {
+            return getTokenBody(token)
                     .getExpiration()
                     .before(new Date());
-
-            log.error("============== ACCESS TOKEN HAS BEEN EXPIRED ==============");
-
-            if(before){
-                throw new Exception("Access token has been expired");
-            }
         }
 
         /**

@@ -1,10 +1,9 @@
 package date_naeun.naeunserver.api;
 
-import date_naeun.naeunserver.config.jwt.CustomUserDetail;
-import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
 import date_naeun.naeunserver.config.jwt.dto.TokenRefreshDto;
-import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
+import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.external.client.kakao.service.KakaoUserService;
@@ -39,6 +38,8 @@ public class SocialLoginApiController {
         String accessToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
         log.info("access Token = {}", accessToken);
 
+        if (accessToken.equals("")) throw new TokenErrorException(TokenStatus.EMPTY_TOKEN);
+
         // token으로 카카오 사용자 정보 가져오기
         KakaoUserInfo kakaoUserInfo = kakaoUserService.getKakaoUserInfo(accessToken);
 
@@ -57,8 +58,12 @@ public class SocialLoginApiController {
      */
     @GetMapping("/api/auth/getnewtoken")
     public ResultDto<Object> getNewToken(@RequestHeader HttpHeaders headers) {
-        String refreshToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
-        String accessToken = kakaoUserService.regenerateToken(refreshToken);
-        return ResultDto.of(HttpStatus.OK, "토큰 재발급", TokenRefreshDto.of(accessToken));
+        try {
+            String refreshToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
+            String accessToken = kakaoUserService.regenerateToken(refreshToken);
+            return ResultDto.of(HttpStatus.OK, "토큰 재발급", TokenRefreshDto.of(accessToken));
+        } catch (NullPointerException e) {
+            throw new TokenErrorException(TokenStatus.EMPTY_TOKEN);
+        }
     }
 }
