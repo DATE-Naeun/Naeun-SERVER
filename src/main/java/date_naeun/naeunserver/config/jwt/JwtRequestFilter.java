@@ -21,7 +21,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private static final String BEARER_PREFIX = "Bearer";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     /**
      * SecurityContext에 Access Token으로부터 뽑아온 인증 정보를 저장하는 메서드
@@ -35,14 +35,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // request: 헤더에서 넘어오는 JWT
-        String jwt = resolveToken(request);
-        log.info("jwt token = {}", jwt);
 
-        // token 검사
-        if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
-            Authentication authentication = jwtProvider.getAuthentication(jwt);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        // "/api/auth/social" 경로로의 요청은 필터를 실행하지 않도록 걸러낸다.
+        if (!request.getRequestURI().equals("/api/auth/social")) {
+            // request: 헤더에서 넘어오는 JWT
+            String jwt = resolveToken(request);
+            log.info("jwt token = {}", jwt);
+
+            // token 검사
+            if (jwtProvider.validateToken(jwt)) {
+                Authentication authentication = jwtProvider.getAuthentication(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request, response);
     }
@@ -53,9 +57,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private String resolveToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
-            return token.substring(7);  // "Bearer "를 뺀 값, 즉 토큰 값
+            return token.substring(7);  // "Bearer "를 제외한 토큰 값
         }
-
         return null;
+
     }
 }

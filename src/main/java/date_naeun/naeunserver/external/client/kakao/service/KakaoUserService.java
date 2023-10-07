@@ -111,7 +111,7 @@ public class KakaoUserService {
     private TokenDto createTokens(User user, String type) {
         // Access Token 생성
         log.info("Token 생성 시작");
-        String accessToken = delegateAccessToken(user.getEmail(), user.getRole());
+        String accessToken = delegateAccessToken(user.getId(), user.getEmail(), user.getRole());
         log.info("Access Token = {}", accessToken);
 
         // Refresh Token 생성
@@ -124,11 +124,10 @@ public class KakaoUserService {
     /**
      *  Access Token 생성
      */
-    private String delegateAccessToken(String email, Role role) {
+    private String delegateAccessToken(Long id, String email, Role role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", email); // Principal
+        claims.put("id", id);
         claims.put("role", role);
-
         return jwtProvider.generateAccessToken(claims, email);
     }
 

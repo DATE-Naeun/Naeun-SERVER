@@ -1,18 +1,15 @@
 package date_naeun.naeunserver.config;
 
-import date_naeun.naeunserver.config.jwt.JwtProvider;
+import date_naeun.naeunserver.config.jwt.JwtRequestFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,20 +17,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 public class SecurityConfig {
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf().disable()
+
+                /* 컨트롤러 수행 전에 jwt 토큰 검사 먼저 진행 */
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
 
                 /* 세션 사용하지 않음 */
                 .sessionManagement()
@@ -46,9 +38,9 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/social").permitAll()    // 모든 접근 허용
+                .antMatchers("/api/**").authenticated()     // 인증만 되면 들어갈 수 있는 주소
+                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")   // 관리자만 접속 가능한 주소
                 .anyRequest().authenticated()  // 이외에는 접근 권한 필요
-
-                .and()
-                .build();
+                .and().build();
     }
 }
