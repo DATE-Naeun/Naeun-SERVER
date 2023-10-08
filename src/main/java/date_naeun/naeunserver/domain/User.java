@@ -50,6 +50,10 @@ public class User {
     @CollectionTable(name = "user_dislike_ingr_list", joinColumns = @JoinColumn(name = "user_id"))
     private List<Long> dislikeIngrList = new ArrayList<>();
 
+    @ElementCollection @Setter
+    @CollectionTable(name = "history_list", joinColumns = @JoinColumn(name = "user_id"))
+    private List<Long> historyList = new ArrayList<>();
+
     @Builder
     public User(Long id, String name, String email) {
         this.id = id;

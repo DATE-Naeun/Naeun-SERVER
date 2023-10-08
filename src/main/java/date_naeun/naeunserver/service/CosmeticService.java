@@ -23,4 +23,9 @@ public class CosmeticService {
     public List<Cosmetic> findByKeyword(String keyword) {
         return cosmeticRepository.findByKeyword(keyword);
     }
+
+    /* 화장품 id 리스트로 화장품을 가져오는 메서드 */
+    public List<Cosmetic> findByIdList(List<Long> cosmeticList) {
+        return cosmeticRepository.findAllById(cosmeticList);
+    }
 }
