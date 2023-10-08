@@ -8,12 +8,11 @@ import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
 import date_naeun.naeunserver.config.jwt.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.exception.AuthErrorStatus;
-import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
-import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
 import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.repository.UserRepository;
+import date_naeun.naeunserver.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -34,6 +33,7 @@ public class KakaoUserService {
 
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * 카카오 액세스 토큰으로 카카오 사용자 정보 받아오는 메서드
@@ -114,14 +114,9 @@ public class KakaoUserService {
      */
     private TokenDto createTokens(User user, String type) {
         // Access Token 생성
-        log.info("Token 생성 시작");
         String accessToken = delegateAccessToken(user.getId(), user.getEmail(), user.getRole());
-        log.info("Access Token = {}", accessToken);
-
         // Refresh Token 생성
-        String refreshToken = delegateRefreshToken(user.getId(), user.getEmail(), user.getRole());
-        log.info("Refresh Token = {}", refreshToken);
-
+        String refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
         return new TokenDto(type, accessToken, refreshToken);
     }
 
@@ -135,23 +130,4 @@ public class KakaoUserService {
         return jwtProvider.generateAccessToken(claims, email);
     }
 
-    /**
-     *  Refresh Token 생성
-     */
-    private String delegateRefreshToken(Long id, String email, Role role) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", id);
-        claims.put("role", role);
-        return jwtProvider.generateRefreshToken(claims, email);
-    }
-
-    public String regenerateToken(String refreshToken) {
-        if (jwtProvider.verifyExpireMin(refreshToken)) {
-            throw new TokenErrorException(TokenStatus.REFRESH_EXPIRED);
-        }
-        if (jwtProvider.validateToken(refreshToken)) {
-            return jwtProvider.regenerateToken(refreshToken);
-        }
-        return "";
-    }
 }

@@ -7,6 +7,7 @@ import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.external.client.kakao.service.KakaoUserService;
+import date_naeun.naeunserver.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import java.util.Objects;
 public class SocialLoginApiController {
 
     private final KakaoUserService kakaoUserService;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * 카카오 소셜 회원가입/로그인
@@ -60,7 +62,7 @@ public class SocialLoginApiController {
     public ResultDto<Object> getNewToken(@RequestHeader HttpHeaders headers) {
         try {
             String refreshToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
-            String accessToken = kakaoUserService.regenerateToken(refreshToken);
+            String accessToken = refreshTokenService.reAccessToken(refreshToken);
             return ResultDto.of(HttpStatus.OK, "토큰 재발급", TokenRefreshDto.of(accessToken));
         } catch (NullPointerException e) {
             throw new TokenErrorException(TokenStatus.EMPTY_TOKEN);

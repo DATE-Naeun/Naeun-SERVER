@@ -61,12 +61,11 @@
          * Refresh Token 생성 메서드
          * - Access Token이 만료되었을 경우 생성
          */
-        public String generateRefreshToken(Map<String, Object> claims, String subject) {
+        public String generateRefreshToken(String subject) {
             //토큰 생성시간
             Instant now = Instant.from(OffsetDateTime.now());
 
             return Jwts.builder()
-                    .setClaims(claims)
                     .setSubject(subject)
                     .setExpiration(Date.from(now.plusMillis(refreshTokenValidationTime)))
                     .signWith(secretKey)
@@ -102,18 +101,9 @@
             return false;
         }
 
-        public String regenerateToken(String token) {
-            Claims claims = getTokenBody(token);
-            return generateAccessToken(claims, claims.getSubject());
-        }
-
-        /**
-         * JWT 토큰 만료시간 검증
-         */
-        public boolean verifyExpireMin(String token) {
+        public Date getExpireMin(String token) {
             return getTokenBody(token)
-                    .getExpiration()
-                    .before(new Date());
+                    .getExpiration();
         }
 
         /**
