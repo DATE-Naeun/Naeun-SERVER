@@ -2,7 +2,7 @@ package date_naeun.naeunserver.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import date_naeun.naeunserver.config.jwt.dto.TokenErrorResponse;
-import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
+import date_naeun.naeunserver.config.exception.TokenErrorException;
 import date_naeun.naeunserver.dto.ResultDto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,11 +23,11 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch(TokenErrorException e) {
             TokenErrorResponse jwtErrorResponse = new TokenErrorResponse(e.getTokenStatus());
-            errorResponse(request, response, jwtErrorResponse);
+            errorResponse(response, jwtErrorResponse);
         }
     }
 
-    private static void errorResponse(HttpServletRequest request, HttpServletResponse response, TokenErrorResponse jwtErrorResponse) throws IOException {
+    private static void errorResponse(HttpServletResponse response, TokenErrorResponse jwtErrorResponse) throws IOException {
         // response 객체를 사용하여 HTTP 응답을 설정
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 상태 코드 설정 (예: 200 OK)
         response.setContentType("application/json"); // 응답 형식 설정 (JSON 등)

@@ -1,6 +1,6 @@
 package date_naeun.naeunserver.config.jwt.dto;
 
-import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
+import date_naeun.naeunserver.config.exception.TokenStatus;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 

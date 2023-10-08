@@ -1,24 +1,18 @@
 package date_naeun.naeunserver.service;
 
 import date_naeun.naeunserver.config.jwt.JwtProvider;
-import date_naeun.naeunserver.config.jwt.dto.TokenDto;
-import date_naeun.naeunserver.config.jwt.dto.TokenRefreshDto;
-import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
-import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
+import date_naeun.naeunserver.config.exception.TokenErrorException;
+import date_naeun.naeunserver.config.exception.TokenStatus;
 import date_naeun.naeunserver.domain.RefreshToken;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.repository.RefreshTokenRepository;
 import date_naeun.naeunserver.repository.UserRepository;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

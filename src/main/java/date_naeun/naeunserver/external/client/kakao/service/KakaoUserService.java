@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
-import date_naeun.naeunserver.config.jwt.exception.AuthErrorException;
-import date_naeun.naeunserver.config.jwt.exception.AuthErrorStatus;
+import date_naeun.naeunserver.config.exception.AuthErrorException;
+import date_naeun.naeunserver.config.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
@@ -50,6 +50,7 @@ public class KakaoUserService {
         // HttpHeader 담기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
 
+
         // 사용자 정보 요청 (POST)
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
@@ -67,7 +68,11 @@ public class KakaoUserService {
 
         try {
             originAttributes = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-            log.info("originAttributes = {}", originAttributes);
+
+            if (originAttributes.containsKey("code") && originAttributes.get("code").equals(-401)) {
+                // 토큰이 만료된 경우 예외 처리
+                throw new AuthErrorException(AuthErrorStatus.SOCIAL_TOKEN_EXPIRED);
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

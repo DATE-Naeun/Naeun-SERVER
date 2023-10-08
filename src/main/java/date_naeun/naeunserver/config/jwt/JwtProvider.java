@@ -1,7 +1,7 @@
     package date_naeun.naeunserver.config.jwt;
 
-    import date_naeun.naeunserver.config.jwt.exception.TokenStatus;
-    import date_naeun.naeunserver.config.jwt.exception.TokenErrorException;
+    import date_naeun.naeunserver.config.exception.TokenStatus;
+    import date_naeun.naeunserver.config.exception.TokenErrorException;
     import io.jsonwebtoken.*;
     import io.jsonwebtoken.security.Keys;
     import lombok.RequiredArgsConstructor;
