@@ -24,10 +24,10 @@ public class Cosmetic {
     @Column
     private Long id;
 
-    @Column @Setter
+    @Column
     private String name;
 
-    @Column @Setter
+    @Column
     private String brand;
 
     @Column
