@@ -1,6 +1,5 @@
 package date_naeun.naeunserver;
 
-import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,13 +16,9 @@ import java.util.List;
 public class InitIngrSampleDb {
 
     private final InitIngredientService initIngr_service;
-    private final InitCosmeticService initCosmeticService;
 
     @PostConstruct
-    public void init() {
-        initIngr_service.dbInit();
-        initCosmeticService.dbInitCsmt();
-    }
+    public void init() { initIngr_service.dbInit(); }
 
     @Component
     @Transactional
@@ -46,28 +41,10 @@ public class InitIngrSampleDb {
             em.persist(mg_nit);
             Ingredient alu_mg = createIngr("알루미나마그네슘메타실리케이트",null,null);
             em.persist(alu_mg);
-        }
-    }
-
-    @Component
-    @Transactional
-    @RequiredArgsConstructor
-    static class InitCosmeticService {
-        private final EntityManager em;
-
-        public void dbInitCsmt() {
-            Cosmetic a = createCsmt("레드 블레미쉬", "닥터지", "26400", "4.53","1245");
-            em.persist(a);
-            Cosmetic b = createCsmt("어쩔체리 틴트", "페리페라", "12000", "4.11","789");
-            em.persist(b);
-            Cosmetic c = createCsmt("하트 섀도우", "페리페라", "24000", "4.22","162");
-            em.persist(c);
-            Cosmetic d = createCsmt("그린 마일드 업 선 플러스", "닥터지", "15000", "4.81","541");
-            em.persist(d);
-            Cosmetic e = createCsmt("네오쿠션", "라네즈", "32000", "4.57","3429");
-            em.persist(e);
-            Cosmetic f = createCsmt("킬커버쿠션", "클리오", "34000", "4.42","3421");
-            em.persist(f);
+            Ingredient gl = createIngr("글리세린",new ArrayList<>(Arrays.asList(1L, 2L, 6L, 18L)),null);
+            em.persist(gl);
+            Ingredient cb = createIngr("시어버터",new ArrayList<>(Arrays.asList(1L, 7L, 15L)),new ArrayList<>(Arrays.asList(6L)));
+            em.persist(cb);
         }
     }
 
@@ -80,16 +57,5 @@ public class InitIngrSampleDb {
         ingredient.setHarm_detail_id(harm_detail_id);
 
         return ingredient;
-    }
-
-    static private Cosmetic createCsmt(String name, String brand, String price, String rating, String reviews) {
-        Cosmetic cosmetic = new Cosmetic();
-        cosmetic.setName(name);
-        cosmetic.setBrand(brand);
-        cosmetic.setPrice(price);
-        cosmetic.setRating(rating);
-        cosmetic.setReviews(reviews);
-
-        return cosmetic;
     }
 }
