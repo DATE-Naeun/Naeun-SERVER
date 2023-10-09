@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -17,9 +15,7 @@ public class InitCosmeticSampleDb {
     private final InitCosmeticService initCosmeticService;
 
     @PostConstruct
-    public void init() {
-        initCosmeticService.dbInit();
-    }
+    public void init() { initCosmeticService.dbInit(); }
 
     @Component
     @Transactional
@@ -35,13 +31,29 @@ public class InitCosmeticSampleDb {
                     .price("21000")
                     .build();
 
-            List<Long> ingreList = new ArrayList<>();
-            ingreList.add(1L);
-            ingreList.add(2L);
+            Cosmetic cosmetic2 = Cosmetic.builder()
+                    .name("화장품2")
+                    .brand("웰라쥬")
+                    .image("https://m.wellage.co.kr/web/product/extra/big/202109/3180f25ee5a054775a127372342b852e.jpg")
+                    .price("21000")
+                    .build();
 
-            cosmetic1.setIngredientList(ingreList);
+            Cosmetic cosmetic3 = Cosmetic.builder()
+                    .name("화장품3")
+                    .brand("웰라쥬")
+                    .image("https://m.wellage.co.kr/web/product/extra/big/202109/3180f25ee5a054775a127372342b852e.jpg")
+                    .price("21000")
+                    .build();
+
+//            List<Long> ingreList = new ArrayList<>();
+//            ingreList.add(1L);
+//            ingreList.add(2L);
+//
+//            cosmetic1.setIngredientList(ingreList);
 
             em.persist(cosmetic1);
+            em.persist(cosmetic2);
+            em.persist(cosmetic3);
         }
     }
 }
