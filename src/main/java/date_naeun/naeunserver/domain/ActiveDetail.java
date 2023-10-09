@@ -13,7 +13,7 @@ public class ActiveDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "active_id")
+    @Column(name = "id")
     private Long id;
 
     private String description;

@@ -13,7 +13,7 @@ public class HarmfulDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "harm_id")
+    @Column(name = "id")
     private Long id;
 
     private String description;
