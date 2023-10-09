@@ -4,15 +4,13 @@ import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.dto.CosmeticDto;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.service.CosmeticService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -20,6 +18,27 @@ import java.util.stream.Collectors;
 public class CosmeticApiController {
 
     private final CosmeticService cosmeticService;
+
+    @PostMapping("/api/cosmetic")
+    public ResultDto<CreateCosmeticFromPhotoResponseDto> createCosmeticFromPhoto(@RequestBody CreateCosmeticFromPhotoRequestDto createCosmeticFromPhotoRequestDto) {
+        Long cosmeticId = cosmeticService.createCosmeticFromPhoto(createCosmeticFromPhotoRequestDto.cosmeticName, createCosmeticFromPhotoRequestDto.brand,
+                createCosmeticFromPhotoRequestDto.category, createCosmeticFromPhotoRequestDto.ingredients).getId();
+        return ResultDto.of(HttpStatus.CREATED, "촬영으로 비교할 화장품 추가하기 성공", new CreateCosmeticFromPhotoResponseDto(cosmeticId));
+    }
+
+    @Data
+    static class CreateCosmeticFromPhotoRequestDto {
+        String cosmeticName;
+        String brand;
+        String category;
+        List<String> ingredients;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class CreateCosmeticFromPhotoResponseDto {
+        Long cosmeticId;
+    }
 
     @GetMapping("/api/cosmetic/search")
     public ResultDto<List<CosmeticDto>> searchCosmetic(@RequestParam String keyword) {
