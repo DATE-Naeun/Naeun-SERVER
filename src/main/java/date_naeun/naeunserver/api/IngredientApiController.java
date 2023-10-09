@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Ingredient;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.IngredientDetailDto;
@@ -10,10 +11,11 @@ import date_naeun.naeunserver.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +46,8 @@ public class IngredientApiController {
      * getUserIngredient
      */
     @GetMapping("/api/ingredient/user")
-    public ResultDto<Object> getUserIngr(@RequestHeader HttpHeaders headers, @RequestParam boolean isPreference) {
-        User user = getUser(headers);
+    public ResultDto<Object> getUserIngr(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestParam boolean isPreference) {
+        User user = getUser(userDetail);
 
         List<Ingredient> findUserIngr = ingr_service.getIngrForUser(user, isPreference);
 
@@ -76,8 +78,8 @@ public class IngredientApiController {
      * updateUserIngredient
      */
     @PostMapping("/api/ingredient/user")
-    public ResultDto<Object> createUserIngredient(@RequestHeader HttpHeaders headers, @RequestBody @Valid AddUserIngrRequest request) {
-        User user = getUser(headers);
+    public ResultDto<Object> createUserIngredient(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid AddUserIngrRequest request) {
+        User user = getUser(userDetail);
 
         ingr_service.addIngrToUser(user, request.isPreference(), request.getAddedIngredient());
         System.out.println(request.isPreference);
@@ -93,8 +95,8 @@ public class IngredientApiController {
      * 유저별 선호/기피 성분 삭제
      */
     @PutMapping("/api/ingredient/user")
-    public ResultDto<Object> deleteUserIngr(@RequestHeader HttpHeaders headers, @RequestBody @Valid DeleteUserIngrRequest request) {
-        User user = getUser(headers);
+    public ResultDto<Object> deleteUserIngr(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid DeleteUserIngrRequest request) {
+        User user = getUser(userDetail);
 
         String responseMsg = ingr_service.deleteIngrList(user, request.isPreference(), request.getDeletedIngr());
 
@@ -105,12 +107,15 @@ public class IngredientApiController {
         }
     }
 
-    private User getUser(HttpHeaders headers) {
-        String accessToken = headers.getFirst("accessToken");
-        System.out.println(accessToken);
-
-        Long user_id = 1L;
-        return user_service.findUserById(user_id);
+    /**
+     * JWT 토큰으로 사용자를 받아오는 메서드
+     */
+    private User getUser(CustomUserDetail userDetail) {
+        if (userDetail == null) {
+            throw new EntityNotFoundException("해당 토큰으로 사용자를 조회할 수 없습니다.");
+        }
+        // accessToken 검증 후 생성된 userDetail의 id로 user 찾아서 생성
+        return user_service.findUserById(userDetail.getId());
     }
 
     @Data

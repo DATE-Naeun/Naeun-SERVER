@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -58,5 +59,16 @@ public class UserRepository {
     /* 변경한 user 를 DB에 반영하는 메서드 */
     public void updateUserCosmetic(User user) {
         em.merge(user);
+    }
+
+    /* 이메일로 user를 반환하는 메서드 */
+    public User findByEmail(String email) {
+        try {
+            return em.createQuery("select u from User u where u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null; // 결과가 없으면 null 반환
+        }
     }
 }
