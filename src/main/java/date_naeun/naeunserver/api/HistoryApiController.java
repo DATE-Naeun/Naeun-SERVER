@@ -67,6 +67,17 @@ public class HistoryApiController {
     }
 
     /**
+     * 사용자 피부타입에서 가장 인기 있는 화장품 3개 가져오기
+     */
+    @GetMapping("/api/cosmetic/ranking")
+    public ResultDto<Object> getCosmeticRankingBySkinType(@AuthenticationPrincipal CustomUserDetail userDetail) {
+        User user = getUser(userDetail);
+        List<Cosmetic> top3 = cosmeticService.getTop3(user.getSkinType().getId());
+        List<CosmeticDto> cosmeticDtos = top3.stream().map(CosmeticDto::new).collect(Collectors.toList());
+        return ResultDto.of(HttpStatus.OK, "피부타입별 많이 비교한 화장품 가져오기 성공", cosmeticDtos);
+    }
+
+    /**
      * JWT 토큰으로 사용자를 받아오는 메서드
      */
     private User getUser(CustomUserDetail userDetail) {
