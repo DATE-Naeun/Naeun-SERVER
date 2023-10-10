@@ -1,6 +1,6 @@
 package date_naeun.naeunserver.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Review;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.ResultDto;
@@ -8,16 +8,12 @@ import date_naeun.naeunserver.dto.ReviewDetailDto;
 import date_naeun.naeunserver.dto.ReviewRequestDto;
 import date_naeun.naeunserver.service.ReviewService;
 import date_naeun.naeunserver.service.UserService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +30,11 @@ public class ReviewApiController {
     @GetMapping("/api/cosmetic/review/{cosmeticId}")
     public ResultDto<Map<String, Object>> getReviewsForCosmetic(
             @PathVariable Long cosmeticId,
-            @RequestHeader HttpHeaders headers,
+            @AuthenticationPrincipal CustomUserDetail userDetail,
             @RequestParam(required = false, defaultValue = "recent") String sort,
             @RequestParam(required = false, defaultValue = "0") int mytype
     ) {
-        User user = getUser(headers);
+        User user = getUser(userDetail);
         List<Review> reviews = reviewService.getReviewByCosmeticId(user, cosmeticId, sort, mytype);
 
         double ratingAvg = reviewService.calculateRatingAvg(cosmeticId);
@@ -61,21 +57,24 @@ public class ReviewApiController {
     }
 
     @PostMapping("/api/cosmetic/review")
-    public ResultDto<Object> createCosmeticReview(@RequestHeader HttpHeaders headers,
+    public ResultDto<Object> createCosmeticReview(@AuthenticationPrincipal CustomUserDetail userDetail,
                                                   @RequestBody @Valid ReviewRequestDto requestDto) {
-        User user = getUser(headers);
+        User user = getUser(userDetail);
         reviewService.addCosmeticReview(user, requestDto);
         System.out.println(requestDto);
         return ResultDto.of(HttpStatus.OK, "리뷰 작성하기 성공", null);
     }
 
 
-    private User getUser(HttpHeaders headers) {
-        String accessToken = headers.getFirst("accessToken");
-        System.out.println(accessToken);
-
-        Long user_id = 1L;
-        return userService.findUserById(user_id);
+    /**
+     * JWT 토큰으로 사용자를 받아오는 메서드
+     */
+    private User getUser(CustomUserDetail userDetail) {
+        if (userDetail == null) {
+            throw new EntityNotFoundException("해당 토큰으로 사용자를 조회할 수 없습니다.");
+        }
+        // accessToken 검증 후 생성된 userDetail의 id로 user 찾아서 생성
+        return userService.findUserById(userDetail.getId());
     }
 
 }
