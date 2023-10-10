@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.service;
 
 import date_naeun.naeunserver.domain.Cosmetic;
+import date_naeun.naeunserver.domain.SkinType;
 import date_naeun.naeunserver.repository.CosmeticRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,9 @@ public class CosmeticService {
     /* 화장품 id 리스트로 화장품을 가져오는 메서드 */
     public List<Cosmetic> findByIdList(List<Long> cosmeticList) {
         return cosmeticRepository.findAllById(cosmeticList);
+    }
+
+    public List<Cosmetic> getTop3(Long skinType_id) {
+        return cosmeticRepository.findRankingTop3(skinType_id);
     }
 }

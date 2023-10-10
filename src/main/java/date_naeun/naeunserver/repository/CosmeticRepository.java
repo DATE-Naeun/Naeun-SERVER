@@ -1,12 +1,15 @@
 package date_naeun.naeunserver.repository;
 
 import date_naeun.naeunserver.domain.Cosmetic;
+import date_naeun.naeunserver.domain.SkinType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -39,5 +42,31 @@ public class CosmeticRepository {
         return em.createQuery("select c from Cosmetic c where c.name LIKE CONCAT('%', :name, '%') OR c.brand LIKE CONCAT('%', :name, '%')", Cosmetic.class)
                 .setParameter("name", name)
                 .getResultList();
+    }
+
+    /**
+     * 인기 화장품 랭킹 3
+     */
+    public List<Cosmetic> findRankingTop3(Long userSkinType) {
+        String jpqlQuery = "SELECT c\n" +
+                "FROM user_table u \n" +
+                "JOIN SkinType s ON u.id in s.users \n" +
+                "JOIN History h ON h.id in u.historyList\n" +
+                "JOIN Cosmetic c ON c.id in h.cosmeticList\n" +
+                "WHERE s.id = :userSkinType\n" +
+                "GROUP BY c\n" +
+                "ORDER BY count(c) DESC";
+
+        List<Object[]> resultList = em.createQuery(jpqlQuery, Object[].class)
+                                        .setParameter("userSkinType", userSkinType)
+                                        .setMaxResults(3)
+                                        .getResultList();
+
+        List<Cosmetic> cosmetics = new ArrayList<>();
+        for (Object[] result : resultList) {
+            Cosmetic cosmetic = (Cosmetic) result[0];
+            cosmetics.add(cosmetic);
+        }
+        return cosmetics;
     }
 }
