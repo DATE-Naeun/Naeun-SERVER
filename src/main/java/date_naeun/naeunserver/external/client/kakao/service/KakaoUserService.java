@@ -12,7 +12,6 @@ import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.repository.UserRepository;
-import date_naeun.naeunserver.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -33,7 +32,6 @@ public class KakaoUserService {
 
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenService refreshTokenService;
 
     /**
      * 카카오 액세스 토큰으로 카카오 사용자 정보 받아오는 메서드
@@ -121,7 +119,7 @@ public class KakaoUserService {
         // Access Token 생성
         String accessToken = delegateAccessToken(user.getId(), user.getEmail(), user.getRole());
         // Refresh Token 생성
-        String refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getId());
         return new TokenDto(type, accessToken, refreshToken);
     }
 

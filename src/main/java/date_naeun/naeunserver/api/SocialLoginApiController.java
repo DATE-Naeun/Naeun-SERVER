@@ -1,7 +1,9 @@
 package date_naeun.naeunserver.api;
 
+import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.AuthErrorResponse;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
+import date_naeun.naeunserver.config.jwt.dto.TokenErrorResponse;
 import date_naeun.naeunserver.config.jwt.dto.TokenRefreshDto;
 import date_naeun.naeunserver.config.exception.AuthErrorException;
 import date_naeun.naeunserver.config.exception.TokenStatus;
@@ -9,7 +11,7 @@ import date_naeun.naeunserver.config.exception.TokenErrorException;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.external.client.kakao.service.KakaoUserService;
-import date_naeun.naeunserver.service.RefreshTokenService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +33,7 @@ import java.util.Objects;
 public class SocialLoginApiController {
 
     private final KakaoUserService kakaoUserService;
-    private final RefreshTokenService refreshTokenService;
+    private final JwtProvider jwtProvider;
 
     /**
      * 카카오 소셜 회원가입/로그인
@@ -69,10 +71,11 @@ public class SocialLoginApiController {
     public ResultDto<Object> getNewToken(@RequestHeader HttpHeaders headers) {
         try {
             String refreshToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
-            String accessToken = refreshTokenService.reAccessToken(refreshToken);
+            String accessToken = jwtProvider.reAccessToken(refreshToken);
             return ResultDto.of(HttpStatus.OK, "토큰 재발급", TokenRefreshDto.of(accessToken));
-        } catch (NullPointerException e) {
-            throw new TokenErrorException(TokenStatus.EMPTY_TOKEN);
+        } catch (TokenErrorException e) {
+            TokenErrorResponse t = new TokenErrorResponse(e.getTokenStatus());
+            return ResultDto.of(t.getHttpStatus(), t.getErrorMessage(), null);
         }
     }
 }
