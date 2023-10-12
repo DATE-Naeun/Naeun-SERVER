@@ -1,6 +1,5 @@
 package date_naeun.naeunserver.repository;
 
-import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -28,7 +27,7 @@ public class IngredientRepository {
         return em.find(Ingredient.class, id);
     }
 
-    public List<Ingredient> findALl() {
+    public List<Ingredient> findAll() {
         return em.createQuery("select i from Ingredient i", Ingredient.class)
                 .getResultList();
     }

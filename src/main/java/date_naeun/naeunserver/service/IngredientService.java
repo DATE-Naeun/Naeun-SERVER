@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ public class IngredientService {
      * 전체 성분 조회
      */
     public List<Ingredient> findAllIngr() {
-        return ingr_repository.findALl();
+        return ingr_repository.findAll();
     }
 
     /**

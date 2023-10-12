@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,6 +30,11 @@ public class IngredientApiController {
     @GetMapping("/api/ingredient/search")
     public ResultDto<Map<String, Object>> ingr(@RequestParam String keyword) {
         List<Ingredient> findIngr = ingr_service.findOneIngr(keyword);
+
+        if (findIngr.isEmpty()) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "검색 결과가 없습니다.", null);
+        }
+
         List<IngredientDetailDto> collect = findIngr.stream()
                 .map(IngredientDetailDto::new)
                 .collect(Collectors.toList());
@@ -80,6 +83,35 @@ public class IngredientApiController {
     @PostMapping("/api/ingredient/user")
     public ResultDto<Object> createUserIngredient(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid AddUserIngrRequest request) {
         User user = getUser(userDetail);
+        List<Ingredient> findAll = ingr_service.findAllIngr();
+
+        List<Long> allIngrIds = findAll.stream()
+                .map(Ingredient::getId)
+                .collect(Collectors.toList());
+
+        // 성분 ID 리스트에 중복된 값이 있는지 검사
+        Set<Long> uniqueIds = new HashSet<>(request.getAddedIngredient());
+        if (uniqueIds.size() != request.getAddedIngredient().size()) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "성분 ID가 중복되었습니다.", null);
+        }
+
+        // 성분 list가 없는 경우
+        if (request.addedIngredient.isEmpty()) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "성분 list가 없습니다.", null);
+        }
+
+        for (Long id : request.getAddedIngredient()) {
+            // 입력받은 id가 정수가 아닌 경우
+            if(!isPositiveInteger(id)) {
+                String errorMessage = id + "가 정수가 아닙니다.";
+                return ResultDto.of(HttpStatus.BAD_REQUEST, errorMessage, null);
+            }
+
+            if(!allIngrIds.contains(id)) {
+                String errorMessage = id + "가 존재하지 않습니다.";
+                return ResultDto.of(HttpStatus.BAD_REQUEST, errorMessage, null);
+            }
+        }
 
         ingr_service.addIngrToUser(user, request.isPreference(), request.getAddedIngredient());
         System.out.println(request.isPreference);
@@ -89,6 +121,11 @@ public class IngredientApiController {
         } else {
             return ResultDto.of(HttpStatus.OK, "사용자 기피 성분 추가하기 성공", null);
         }
+    }
+
+    private boolean isPositiveInteger(Long value) {
+        // Long 데이터가 null 또는 0보다 작거나 같으면 정수가 아닌 것으로 판별
+        return value != null && value > 0;
     }
 
     /**
@@ -103,7 +140,7 @@ public class IngredientApiController {
         if (responseMsg.equals("")) {
             return ResultDto.of(HttpStatus.OK, "삭제 성공", null);
         } else {
-            return ResultDto.of(HttpStatus.OK, responseMsg, null);
+            return ResultDto.of(HttpStatus.BAD_REQUEST, responseMsg, null);
         }
     }
 
