@@ -49,13 +49,11 @@ public class CosmeticRepository {
      */
     public List<Cosmetic> findRankingTop3(Long userSkinType) {
         String jpqlQuery = "SELECT c\n" +
-                "FROM user_table u \n" +
-                "JOIN SkinType s ON u.id in s.users \n" +
-                "JOIN History h ON h.id in u.historyList\n" +
-                "JOIN Cosmetic c ON c.id in h.cosmeticList\n" +
-                "WHERE s.id = :userSkinType\n" +
-                "GROUP BY c\n" +
-                "ORDER BY count(c) DESC";
+                "FROM user_table u WHERE u.skinType = :userSkinType\n" +
+                "JOIN History h ON h.id IN u.historyList\n" +
+                "JOIN Cosmetic c ON c.id IN h.cosmeticList\n" +
+                "GROUP BY c.id\n" +
+                "ORDER BY count(c.id) DESC";
 
         List<Object[]> resultList = em.createQuery(jpqlQuery, Object[].class)
                                         .setParameter("userSkinType", userSkinType)
