@@ -23,9 +23,9 @@ public class History {
     // 비교한 화장품 리스트
     @ElementCollection @Setter
     @CollectionTable(name = "history_cosmetic_list", joinColumns = @JoinColumn(name = "history_id"))
-    private List<Long> cosmeticList;
+    private List<Cosmetic> cosmeticList;
 
-    public History(Date date, List<Long> cosmeticList) {
+    public History(Date date, List<Cosmetic> cosmeticList) {
         this.date = date;
         this.cosmeticList = cosmeticList;
     }
