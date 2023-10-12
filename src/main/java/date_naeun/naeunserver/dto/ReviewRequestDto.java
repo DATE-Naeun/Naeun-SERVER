@@ -8,7 +8,7 @@ import java.util.List;
 public class ReviewRequestDto {
 
         private Long cosmeticId;
-        private double rating;
+        private Double rating;
         private boolean isOpen;
         private String content;
         private String texture;

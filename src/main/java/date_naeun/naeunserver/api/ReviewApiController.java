@@ -60,9 +60,23 @@ public class ReviewApiController {
     public ResultDto<Object> createCosmeticReview(@AuthenticationPrincipal CustomUserDetail userDetail,
                                                   @RequestBody @Valid ReviewRequestDto requestDto) {
         User user = getUser(userDetail);
+
+        if (requestDto.getRating() == null) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "별점이 없습니다.", null);
+        }
+        if (requestDto.getContent() == null ) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "리뷰 내용이 없습니다.", null);
+        }
+        if (requestDto.getTexture() == null ) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "발림성이 없습니다.", null);
+        }
+        if (requestDto.getRepurchase() == null ) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "재구매 의사가 없습니다.", null);
+        }
+
         reviewService.addCosmeticReview(user, requestDto);
         System.out.println(requestDto);
-        return ResultDto.of(HttpStatus.OK, "리뷰 작성하기 성공", null);
+        return ResultDto.of(HttpStatus.CREATED, "리뷰 작성하기 성공", null);
     }
 
 
