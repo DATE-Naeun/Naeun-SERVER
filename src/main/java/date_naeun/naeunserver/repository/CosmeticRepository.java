@@ -51,20 +51,13 @@ public class CosmeticRepository {
         String jpqlQuery = "SELECT c\n" +
                 "FROM user_table u WHERE u.skinType = :userSkinType\n" +
                 "JOIN History h ON h.id IN u.historyList\n" +
-                "JOIN Cosmetic c ON c.id IN h.cosmeticList\n" +
+                "JOIN Cosmetic c ON c.id IN elements(h.cosmeticList)\n" +
                 "GROUP BY c.id\n" +
                 "ORDER BY count(c.id) DESC";
 
-        List<Object[]> resultList = em.createQuery(jpqlQuery, Object[].class)
-                                        .setParameter("userSkinType", userSkinType)
-                                        .setMaxResults(3)
-                                        .getResultList();
-
-        List<Cosmetic> cosmetics = new ArrayList<>();
-        for (Object[] result : resultList) {
-            Cosmetic cosmetic = (Cosmetic) result[0];
-            cosmetics.add(cosmetic);
-        }
-        return cosmetics;
+        return em.createQuery(jpqlQuery, Cosmetic.class)
+                .setParameter("userSkinType", userSkinType)
+                .setMaxResults(3)
+                .getResultList();
     }
 }
