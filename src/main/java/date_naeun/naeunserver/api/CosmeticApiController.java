@@ -43,6 +43,10 @@ public class CosmeticApiController {
     @GetMapping("/api/cosmetic/search")
     public ResultDto<List<CosmeticDto>> searchCosmetic(@RequestParam String keyword) {
         List<Cosmetic> findCosmetic = cosmeticService.findByKeyword(keyword);
+
+        if (findCosmetic.isEmpty()) {
+            return ResultDto.of(HttpStatus.BAD_REQUEST, "검색 결과가 없습니다.", null);
+        }
         List<CosmeticDto> collect = findCosmetic.stream()
                 .map(CosmeticDto::new)
                 .collect(Collectors.toList());
