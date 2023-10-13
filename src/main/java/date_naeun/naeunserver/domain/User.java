@@ -59,6 +59,14 @@ public class User {
     @CollectionTable(name = "history_list", joinColumns = @JoinColumn(name = "user_id"))
     private List<Long> historyList = new ArrayList<>();
 
+    // 트러블
+    @Setter
+    private Boolean trouble;
+
+    // 미백
+    @Setter
+    private Boolean whitening;
+
 
     @Builder
     public User(Long id, String name, String email) {
