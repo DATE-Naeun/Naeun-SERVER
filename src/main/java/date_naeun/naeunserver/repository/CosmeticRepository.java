@@ -45,15 +45,17 @@ public class CosmeticRepository {
     }
 
     /**
-     * 인기 화장품 랭킹 3
+     * 비교기록에 있는 화장품 리스트 조회
      */
-    public List<Cosmetic> findRankingTop3(Long userSkinType) {
-        String jpqlQuery = "SELECT c\n" +
-                "FROM user_table u WHERE u.skinType = :userSkinType\n" +
-                "JOIN History h ON h.id IN u.historyList\n" +
-                "JOIN Cosmetic c ON c.id IN elements(h.cosmeticList)\n" +
-                "GROUP BY c.id\n" +
-                "ORDER BY count(c.id) DESC";
+    public List<Cosmetic> findCosmeticsByHistory(History history) {
+        List<Cosmetic> cosmetics = em.createQuery("select hc.cosmetic from HistoryCosmetic hc where hc.history = :history", Cosmetic.class)
+                .setParameter("history", history)
+                .getResultList();
+        if (cosmetics.isEmpty()) {
+            throw new EntityNotFoundException("비교기록에 화장품이 없습니다.");
+        }
+        return cosmetics;
+    }
 
         return em.createQuery(jpqlQuery, Cosmetic.class)
                 .setParameter("userSkinType", userSkinType)

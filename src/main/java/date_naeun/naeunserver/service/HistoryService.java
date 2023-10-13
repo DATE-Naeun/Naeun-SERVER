@@ -15,18 +15,27 @@ import java.util.List;
 public class HistoryService {
 
     private final HistoryRepository historyRepository;
+    private final CosmeticRepository cosmeticRepository;
 
     /**
-     * 사용자 id로 비교기록 조회
+     * 사용자 엔티티로 비교기록 조회
      */
-    public List<History> getHistoryById(User user) {
-        // user id로 사용자의 비교기록을 찾음.
-        // User 엔티티로부터 비교기록 리스트를 얻음
-        List<Long> historyIds = user.getHistoryList();
-
-        // 비교기록이 없는 경우 null 반환
-        if (historyIds.isEmpty()) return null;
-
-        return historyRepository.findAllById(historyIds);
+    public List<History> getHistoryList(User user) {
+        return historyRepository.findAllByUser(user);
     }
+
+    /**
+     * [To Do]
+     * 비교기록 저장하는 메서드 수정
+     * 일단 샘플로 넣어둠.
+     */
+    public void saveHistory(User user) {
+        List<Long> list = new ArrayList<>();
+        list.add(1L);
+        list.add(2L);
+        List<Cosmetic> allById = cosmeticRepository.findAllById(list);
+        History history = new History(user, allById);   // parameter: User, List<Cosmetic>
+        historyRepository.save(history);
+    }
+
 }

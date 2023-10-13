@@ -39,15 +39,18 @@ public class HistoryApiController {
         // 토큰으로 사용자 찾기
         User user = getUser(userDetail);
 
+        // 비교기록 저장 (sample)
+        historyService.saveHistory(user);
+
         // 비교기록 가져오기
-        List<History> findHistories = historyService.getHistoryById(user);
+        List<History> findHistories = historyService.getHistoryList(user);
 
         List<HistoryDto> historyDtos = new ArrayList<>();
 
         // 화장품 리스트 가져오기
         for (History history : findHistories) {
             // 비교 화장품 가져오기
-            List<Cosmetic>  cosmetics = cosmeticService.findByIdList(history.getCosmeticList());
+            List<Cosmetic> cosmetics = cosmeticService.getCosmeticsByHistory(history);
 
             // 화장품 리스트가 비어 있는 경우
             if (cosmetics == null) {
