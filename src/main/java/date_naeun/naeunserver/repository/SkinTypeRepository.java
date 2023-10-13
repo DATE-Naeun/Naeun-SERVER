@@ -36,4 +36,16 @@ public class SkinTypeRepository {
                 .setParameter("typeName", typeName)
                 .getResultList();
     }
+
+    public SkinType findSkinType(String typeName) {
+        List<SkinType> result =  em.createQuery("select s from SkinType s where s.typeName = :typeName", SkinType.class)
+                    .setParameter("typeName", typeName)
+                    .getResultList();
+
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return result.get(0);
+    }
 }
