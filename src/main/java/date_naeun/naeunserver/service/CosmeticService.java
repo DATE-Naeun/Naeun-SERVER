@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.service;
 
 import date_naeun.naeunserver.domain.Cosmetic;
+import date_naeun.naeunserver.domain.History;
 import date_naeun.naeunserver.domain.SkinType;
 import date_naeun.naeunserver.repository.CosmeticRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,10 @@ public class CosmeticService {
         return cosmeticRepository.findCosmeticsByHistory(history);
     }
 
-    public List<Cosmetic> getTop3(Long skinType_id) {
-        return cosmeticRepository.findRankingTop3(skinType_id);
+    /**
+     * 해당 skinType 이 가장 많이 비교했던 화장품 3개 조회
+     */
+    public List<Cosmetic> getTop3(SkinType skinType) {
+        return cosmeticRepository.findRankingTop3(skinType);
     }
 }

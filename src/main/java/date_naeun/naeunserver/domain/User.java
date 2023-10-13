@@ -55,9 +55,8 @@ public class User {
     private Role role;
 
     // 비교기록 id 리스트
-    @ElementCollection @Setter
-    @CollectionTable(name = "history_list", joinColumns = @JoinColumn(name = "user_id"))
-    private List<Long> historyList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<History> historyList = new ArrayList<>();
 
 
     @Builder

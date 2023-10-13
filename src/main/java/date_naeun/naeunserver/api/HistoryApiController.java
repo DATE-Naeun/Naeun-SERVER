@@ -75,7 +75,7 @@ public class HistoryApiController {
     @GetMapping("/api/cosmetic/ranking")
     public ResultDto<Object> getCosmeticRankingBySkinType(@AuthenticationPrincipal CustomUserDetail userDetail) {
         User user = getUser(userDetail);
-        List<Cosmetic> top3 = cosmeticService.getTop3(user.getSkinType().getId());
+        List<Cosmetic> top3 = cosmeticService.getTop3(user.getSkinType());
         List<CosmeticDto> cosmeticDtos = top3.stream().map(CosmeticDto::new).collect(Collectors.toList());
         return ResultDto.of(HttpStatus.OK, "피부타입별 많이 비교한 화장품 가져오기 성공", cosmeticDtos);
     }

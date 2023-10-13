@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.repository;
 
 import date_naeun.naeunserver.domain.History;
+import date_naeun.naeunserver.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

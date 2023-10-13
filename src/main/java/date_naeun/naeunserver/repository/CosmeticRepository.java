@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.repository;
 
 import date_naeun.naeunserver.domain.Cosmetic;
+import date_naeun.naeunserver.domain.History;
 import date_naeun.naeunserver.domain.SkinType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -8,8 +9,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -57,8 +56,14 @@ public class CosmeticRepository {
         return cosmetics;
     }
 
-        return em.createQuery(jpqlQuery, Cosmetic.class)
-                .setParameter("userSkinType", userSkinType)
+    /**
+     * skinType으로 랭킹3 화장품 리스트 조회
+     */
+    public List<Cosmetic> findRankingTop3(SkinType skinType) {
+        return em.createQuery("select hc.cosmetic from HistoryCosmetic hc where hc.history.skinType = :skinType " +
+                        "GROUP BY hc.cosmetic " +
+                        "ORDER BY count(hc.cosmetic) DESC", Cosmetic.class)
+                .setParameter("skinType", skinType)
                 .setMaxResults(3)
                 .getResultList();
     }

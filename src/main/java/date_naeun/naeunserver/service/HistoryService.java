@@ -1,12 +1,15 @@
 package date_naeun.naeunserver.service;
 
+import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.History;
 import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.repository.CosmeticRepository;
 import date_naeun.naeunserver.repository.HistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
