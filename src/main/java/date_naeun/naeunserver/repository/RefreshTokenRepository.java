@@ -31,16 +31,13 @@ public class RefreshTokenRepository {
     }
 
     public RefreshToken findById(final String refreshToken) {
-        try {
-            ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
-            Long userId = valueOperations.get(refreshToken);
 
-            if (Objects.isNull(userId)) {
-                throw new NullPointerException("해당 refresh token으로 사용자를 조회할 수 없습니다.");
-            }
-            return new RefreshToken(refreshToken, userId);
-        } catch (NullPointerException e) {
+        ValueOperations<String, Long> valueOperations = redisTemplate.opsForValue();
+        Long userId = valueOperations.get(refreshToken);
+
+        if (Objects.isNull(userId)) {
             throw new TokenErrorException(TokenStatus.REFRESH_EXPIRED);
         }
+        return new RefreshToken(refreshToken, userId);
     }
 }
