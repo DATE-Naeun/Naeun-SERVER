@@ -9,7 +9,7 @@ public class UserCosmeticErrorException extends RuntimeException{
     private final String errorMsg;
 
     public UserCosmeticErrorException(ApiErrorStatus errorStatus, Object cosmeticId) {
-        this.code = HttpStatusCode.BAD_REQUEST;
+        this.code = errorStatus.getCode();
         if (cosmeticId.equals(0L)) {
             this.errorMsg = errorStatus.name();
         } else {

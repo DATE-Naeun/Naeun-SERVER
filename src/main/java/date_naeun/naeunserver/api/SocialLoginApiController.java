@@ -4,8 +4,7 @@ import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
 import date_naeun.naeunserver.config.jwt.dto.TokenRefreshDto;
 import date_naeun.naeunserver.exception.AuthErrorException;
-import date_naeun.naeunserver.exception.TokenStatus;
-import date_naeun.naeunserver.exception.TokenErrorException;
+import date_naeun.naeunserver.exception.AuthErrorStatus;
 import date_naeun.naeunserver.dto.ResultDto;
 import date_naeun.naeunserver.exception.HttpStatusCode;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
@@ -40,7 +39,7 @@ public class SocialLoginApiController {
 
         String accessToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
 
-        if (accessToken.equals("")) throw new TokenErrorException(TokenStatus.EMPTY_TOKEN);
+        if (accessToken.equals("")) throw new AuthErrorException(AuthErrorStatus.EMPTY_TOKEN);
 
         try {
             // token으로 카카오 사용자 정보 가져오기
@@ -70,7 +69,7 @@ public class SocialLoginApiController {
             String refreshToken = Objects.requireNonNull(headers.getFirst("Authorization")).substring(7);
             String accessToken = jwtProvider.reAccessToken(refreshToken);
             return ResultDto.of(HttpStatusCode.OK, "토큰 재발급", TokenRefreshDto.of(accessToken));
-        } catch (TokenErrorException e) {
+        } catch (AuthErrorException e) {
             return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
         } catch (Exception e) {
             return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
