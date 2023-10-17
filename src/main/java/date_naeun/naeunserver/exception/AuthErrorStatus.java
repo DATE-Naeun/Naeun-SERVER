@@ -1,4 +1,4 @@
-package date_naeun.naeunserver.config.exception;
+package date_naeun.naeunserver.exception;
 
 public enum AuthErrorStatus {
     GET_SOCIAL_INFO_FAILED( "소셜 로그인 회원 정보 조회 실패"),

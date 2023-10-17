@@ -1,7 +1,7 @@
 package date_naeun.naeunserver.config.jwt;
 
-import date_naeun.naeunserver.config.exception.AuthErrorException;
-import date_naeun.naeunserver.config.exception.AuthErrorStatus;
+import date_naeun.naeunserver.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

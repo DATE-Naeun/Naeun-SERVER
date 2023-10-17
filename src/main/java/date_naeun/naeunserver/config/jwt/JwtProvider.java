@@ -1,7 +1,7 @@
     package date_naeun.naeunserver.config.jwt;
 
-    import date_naeun.naeunserver.config.exception.TokenStatus;
-    import date_naeun.naeunserver.config.exception.TokenErrorException;
+    import date_naeun.naeunserver.exception.TokenStatus;
+    import date_naeun.naeunserver.exception.TokenErrorException;
     import date_naeun.naeunserver.domain.RefreshToken;
     import date_naeun.naeunserver.domain.User;
     import date_naeun.naeunserver.repository.RefreshTokenRepository;

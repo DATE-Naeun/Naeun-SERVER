@@ -1,6 +1,5 @@
-package date_naeun.naeunserver.config.exception;
+package date_naeun.naeunserver.exception;
 
-import date_naeun.naeunserver.exception.HttpStatusCode;
 import lombok.Getter;
 
 @Getter

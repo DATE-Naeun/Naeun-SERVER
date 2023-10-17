@@ -1,6 +1,6 @@
 package date_naeun.naeunserver.api;
 
-import date_naeun.naeunserver.config.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;

@@ -1,6 +1,5 @@
-package date_naeun.naeunserver.config.exception;
+package date_naeun.naeunserver.exception;
 
-import org.springframework.http.HttpStatus;
 
 public enum TokenStatus {
     INVALID_TOKEN("유효하지 않은 토큰입니다."),

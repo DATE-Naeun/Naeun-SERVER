@@ -1,6 +1,6 @@
 package date_naeun.naeunserver.api;
 
-import date_naeun.naeunserver.config.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.History;
@@ -14,12 +14,10 @@ import date_naeun.naeunserver.service.CosmeticService;
 import date_naeun.naeunserver.service.HistoryService;
 import date_naeun.naeunserver.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

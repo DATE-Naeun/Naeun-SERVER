@@ -1,7 +1,7 @@
 package date_naeun.naeunserver.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import date_naeun.naeunserver.config.exception.TokenErrorException;
+import date_naeun.naeunserver.exception.TokenErrorException;
 import date_naeun.naeunserver.dto.ResultDto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

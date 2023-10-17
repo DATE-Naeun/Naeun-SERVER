@@ -1,7 +1,7 @@
 package date_naeun.naeunserver.repository;
 
-import date_naeun.naeunserver.config.exception.TokenErrorException;
-import date_naeun.naeunserver.config.exception.TokenStatus;
+import date_naeun.naeunserver.exception.TokenErrorException;
+import date_naeun.naeunserver.exception.TokenStatus;
 import date_naeun.naeunserver.domain.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

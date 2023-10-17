@@ -1,7 +1,7 @@
 package date_naeun.naeunserver.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import date_naeun.naeunserver.config.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Ingredient;
 import date_naeun.naeunserver.domain.User;
