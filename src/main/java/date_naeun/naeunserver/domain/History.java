@@ -1,10 +1,12 @@
 package date_naeun.naeunserver.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,16 +19,29 @@ public class History {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "skin_type_id")
+    private SkinType skinType;
+
     // 비교 날짜
     private Date date;
 
-    // 비교한 화장품 리스트
-    @ElementCollection @Setter
-    @CollectionTable(name = "history_cosmetic_list", joinColumns = @JoinColumn(name = "history_id"))
-    private List<Long> cosmeticList;
+    @OneToMany(mappedBy = "history", cascade = CascadeType.ALL)
+    private final List<HistoryCosmetic> historyCosmeticList = new ArrayList<>();
 
-    public History(Date date, List<Long> cosmeticList) {
-        this.date = date;
-        this.cosmeticList = cosmeticList;
+    public History(User user, List<Cosmetic> cosmeticList) {
+        this.user = user;
+        this.date = new Date();
+        this.skinType = user.getSkinType();
+
+        for (Cosmetic cosmetic: cosmeticList) {
+            HistoryCosmetic historyCosmetic = new HistoryCosmetic(this, cosmetic);
+            this.historyCosmeticList.add(historyCosmetic);
+        }
     }
 }

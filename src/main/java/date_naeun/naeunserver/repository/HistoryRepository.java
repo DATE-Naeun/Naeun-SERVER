@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.repository;
 
 import date_naeun.naeunserver.domain.History;
+import date_naeun.naeunserver.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,17 +22,16 @@ public class HistoryRepository {
     }
 
     /**
-     * history List : id -> History 엔티티로 반환
+     * User로 History 조회
      */
-    public List<History> findAllById(List<Long> historyList) {
-        List<History> histories = em.createQuery("select h from History h where h.id in :historyList", History.class)
-                .setParameter("historyList", historyList)
+    public List<History> findAllByUser(User user) {
+        List<History> histories = em.createQuery("select h from History h where h.user = :user", History.class)
+                .setParameter("user", user)
                 .getResultList();
 
         if (histories.isEmpty()) {
-            throw new EntityNotFoundException("해당 id의 비교기록을 찾을 수 없습니다.");
+            throw new EntityNotFoundException("사용자의 비교기록이 없습니다.");
         }
-
         return histories;
     }
 }

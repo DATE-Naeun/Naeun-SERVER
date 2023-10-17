@@ -39,15 +39,18 @@ public class HistoryApiController {
         // 토큰으로 사용자 찾기
         User user = getUser(userDetail);
 
+        // 비교기록 저장 (sample)
+        historyService.saveHistory(user);
+
         // 비교기록 가져오기
-        List<History> findHistories = historyService.getHistoryById(user);
+        List<History> findHistories = historyService.getHistoryList(user);
 
         List<HistoryDto> historyDtos = new ArrayList<>();
 
         // 화장품 리스트 가져오기
         for (History history : findHistories) {
             // 비교 화장품 가져오기
-            List<Cosmetic>  cosmetics = cosmeticService.findByIdList(history.getCosmeticList());
+            List<Cosmetic> cosmetics = cosmeticService.getCosmeticsByHistory(history);
 
             // 화장품 리스트가 비어 있는 경우
             if (cosmetics == null) {
@@ -64,6 +67,17 @@ public class HistoryApiController {
         }
 
         return ResultDto.of(HttpStatus.OK, "이전 비교 기록 가져오기 성공", historyDtos);
+    }
+
+    /**
+     * 사용자 피부타입에서 가장 인기 있는 화장품 3개 가져오기
+     */
+    @GetMapping("/api/cosmetic/ranking")
+    public ResultDto<Object> getCosmeticRankingBySkinType(@AuthenticationPrincipal CustomUserDetail userDetail) {
+        User user = getUser(userDetail);
+        List<Cosmetic> top3 = cosmeticService.getTop3(user.getSkinType());
+        List<CosmeticDto> cosmeticDtos = top3.stream().map(CosmeticDto::new).collect(Collectors.toList());
+        return ResultDto.of(HttpStatus.OK, "피부타입별 많이 비교한 화장품 가져오기 성공", cosmeticDtos);
     }
 
     /**
