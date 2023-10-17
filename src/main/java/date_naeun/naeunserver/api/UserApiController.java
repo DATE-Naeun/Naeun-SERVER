@@ -1,5 +1,6 @@
 package date_naeun.naeunserver.api;
 
+import date_naeun.naeunserver.config.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.ResultDto;
@@ -19,8 +20,15 @@ public class UserApiController {
 
     @GetMapping("/api/user")
     public ResultDto<UserDto> getUserInfo(@AuthenticationPrincipal CustomUserDetail userDetail) {
-        User user = userService.findUserById(userDetail.getId());
-        return ResultDto.of(HttpStatusCode.OK, "유저 조회 성공", new UserDto(user));
+        try {
+            User user = userService.findUserById(userDetail.getId());
+            return ResultDto.of(HttpStatusCode.OK, "유저 조회 성공", new UserDto(user));
+
+        } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
+        }
     }
 
     @PatchMapping("/api/user")
