@@ -34,6 +34,12 @@ public class User {
     @JoinColumn(name = "skinType_id")
     private SkinType skinType;
 
+    @Setter
+    private boolean Trouble;    // 여드름
+
+    @Setter
+    private boolean Whitening;  // 미백
+
     // 화장품의 id만 추가
     @ElementCollection @Setter
     @CollectionTable(name = "user_cosmetic_list", joinColumns = @JoinColumn(name = "user_id"))
@@ -65,6 +71,8 @@ public class User {
         this.name = name;
         this.email = email;
         this.role = Role.USER;
+        this.Trouble = false;
+        this.Whitening = false;
     }
 }
 
