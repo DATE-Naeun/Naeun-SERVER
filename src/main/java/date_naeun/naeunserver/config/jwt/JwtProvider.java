@@ -1,7 +1,7 @@
     package date_naeun.naeunserver.config.jwt;
 
-    import date_naeun.naeunserver.exception.TokenStatus;
-    import date_naeun.naeunserver.exception.TokenErrorException;
+    import date_naeun.naeunserver.exception.AuthErrorException;
+    import date_naeun.naeunserver.exception.AuthErrorStatus;
     import date_naeun.naeunserver.domain.RefreshToken;
     import date_naeun.naeunserver.domain.User;
     import date_naeun.naeunserver.repository.RefreshTokenRepository;
@@ -49,7 +49,6 @@
          */
         public String generateAccessToken(Map<String, Object> claims,
                                           String subject) {
-            log.info("secret key = {}", secretKey);
             //토큰 생성시간
             Instant now = Instant.from(OffsetDateTime.now());
 
@@ -110,9 +109,9 @@
                 Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
                 return true;
             } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-                throw new TokenErrorException(TokenStatus.INVALID_TOKEN); // 잘못된 토큰
+                throw new AuthErrorException(AuthErrorStatus.INVALID_TOKEN); // 잘못된 토큰
             } catch (ExpiredJwtException e) {
-                throw new TokenErrorException(TokenStatus.EXPIRED_TOKEN); // 만료된 토큰
+                throw new AuthErrorException(AuthErrorStatus.EXPIRED_TOKEN); // 만료된 토큰
             } catch (UnsupportedJwtException e) {
                 log.error("지원되지 않는 토큰입니다.");
             } catch (IllegalArgumentException e) {

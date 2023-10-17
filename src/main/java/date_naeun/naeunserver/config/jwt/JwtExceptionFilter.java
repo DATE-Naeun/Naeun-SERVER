@@ -1,7 +1,7 @@
 package date_naeun.naeunserver.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import date_naeun.naeunserver.exception.TokenErrorException;
+import date_naeun.naeunserver.exception.AuthErrorException;
 import date_naeun.naeunserver.dto.ResultDto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,12 +20,12 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             //JwtFilter 를 호출하는데, 이 필터에서 JwtErrorException 이 떨어진다.
             filterChain.doFilter(request, response);
-        } catch(TokenErrorException e) {
+        } catch(AuthErrorException e) {
             errorResponse(response, e);
         }
     }
 
-    private static void errorResponse(HttpServletResponse response, TokenErrorException e) throws IOException {
+    private static void errorResponse(HttpServletResponse response, AuthErrorException e) throws IOException {
         // response 객체를 사용하여 HTTP 응답을 설정
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 상태 코드 설정 (예: 200 OK)
         response.setContentType("application/json"); // 응답 형식 설정 (JSON 등)

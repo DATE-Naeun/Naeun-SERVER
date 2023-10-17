@@ -9,7 +9,7 @@ public class AuthErrorException extends RuntimeException {
     private final String errorMsg;
 
     public AuthErrorException(AuthErrorStatus authStatus) {
-        this.code = HttpStatusCode.UNAUTHORIZED;
-        this.errorMsg = authStatus.name();
+        this.code = authStatus.getStatusCode();
+        this.errorMsg = authStatus.getMsg();
     }
 }

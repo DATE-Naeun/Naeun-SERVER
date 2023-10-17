@@ -1,7 +1,7 @@
 package date_naeun.naeunserver.repository;
 
-import date_naeun.naeunserver.exception.TokenErrorException;
-import date_naeun.naeunserver.exception.TokenStatus;
+import date_naeun.naeunserver.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class RefreshTokenRepository {
         Long userId = valueOperations.get(refreshToken);
 
         if (Objects.isNull(userId)) {
-            throw new TokenErrorException(TokenStatus.REFRESH_EXPIRED);
+            throw new AuthErrorException(AuthErrorStatus.REFRESH_EXPIRED);
         }
         return new RefreshToken(refreshToken, userId);
     }
