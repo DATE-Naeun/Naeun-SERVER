@@ -36,7 +36,7 @@ public class ComparisonApiController {
         List<CosmeticComparisonDto> result = cosmetics.stream()
                 .map(CosmeticComparisonDto::new)
                 .collect(toList());
-//        historyService.saveHistory(user, cosmetics);
+        historyService.saveHistory(user, cosmetics);
         return ResultDto.of(HttpStatus.OK, "화장품 비교 결과 가져오기 성공", result);
     }
 
