@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,13 +45,18 @@ public class CosmeticDetailApiController {
 
             // 성분리스트 가져오기
             List<Ingredient> ingreList = ingrService.findIngrList(cosmetic);
+            CosmeticDetailDto collect;
 
-            // 성분 Detail 리스트
-            List<IngredientDetailDto> ingr_collect = ingreList.stream()
-                    .map(IngredientDetailDto::new)
-                    .collect(Collectors.toList());
+            if (ingreList != null) {
+                // 성분 Detail 리스트
+                List<IngredientDetailDto> ingr_collect = ingreList.stream()
+                        .map(IngredientDetailDto::new)
+                        .collect(Collectors.toList());
 
-            CosmeticDetailDto collect = new CosmeticDetailDto(cosmetic, ingr_collect);
+                collect = new CosmeticDetailDto(cosmetic, ingr_collect);
+            } else {    // 성분 리스트가 비어 있는 경우
+                collect = new CosmeticDetailDto(cosmetic, new ArrayList<>());
+            }
 
             // 나의 화장대에 있는 화장품인지 확인
             if (user.getUserCosmeticList().contains(cosmeticId)) {
