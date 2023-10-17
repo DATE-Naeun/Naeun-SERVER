@@ -1,17 +1,26 @@
 package date_naeun.naeunserver.config.exception;
 
+import date_naeun.naeunserver.exception.HttpStatusCode;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+@Getter
 public class TokenErrorException extends RuntimeException {
 
-    @Getter
-    private final TokenStatus tokenStatus;
+    private HttpStatusCode code;
+    private final String errorMsg;
 
     public TokenErrorException(TokenStatus tokenStatus) {
-
-        this.tokenStatus = tokenStatus;
+        switch (tokenStatus) {
+            case INVALID_TOKEN:
+            case EMPTY_TOKEN:
+                this.code = HttpStatusCode.BAD_REQUEST;
+                break;
+            case EXPIRED_TOKEN:
+            case REFRESH_EXPIRED:
+                this.code = HttpStatusCode.UNAUTHORIZED;
+                break;
+        }
+        this.errorMsg = tokenStatus.name();
     }
 
 }

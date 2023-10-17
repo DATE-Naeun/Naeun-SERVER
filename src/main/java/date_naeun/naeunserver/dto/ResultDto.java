@@ -1,12 +1,12 @@
 package date_naeun.naeunserver.dto;
 
+import date_naeun.naeunserver.exception.HttpStatusCode;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Data @RequiredArgsConstructor(staticName = "of")
 public class ResultDto<D> {
-    private final HttpStatus code;
+    private final HttpStatusCode code;
     private final String message;
     private final D data;
 }

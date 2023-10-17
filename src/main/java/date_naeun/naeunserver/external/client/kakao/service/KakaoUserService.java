@@ -60,24 +60,21 @@ public class KakaoUserService {
         // Http 응답 (JSON)
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // 카카오 사용자 정보
-        Map<String, Object> originAttributes = null;
-
+        
         try {
-            originAttributes = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
+            // 카카오 사용자 정보
+            Map<String, Object> originAttributes = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
 
             if (originAttributes.containsKey("code") && originAttributes.get("code").equals(-401)) {
                 // 토큰이 만료된 경우 예외 처리
                 throw new AuthErrorException(AuthErrorStatus.SOCIAL_TOKEN_EXPIRED);
             }
+            return new KakaoUserInfo(originAttributes);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-        if (originAttributes == null) throw new AuthErrorException(AuthErrorStatus.GETUSER_FAILED);
-
-        return new KakaoUserInfo(originAttributes);
+        return null;
     }
 
     /**

@@ -1,5 +1,7 @@
 package date_naeun.naeunserver.service;
 
+import date_naeun.naeunserver.config.exception.AuthErrorException;
+import date_naeun.naeunserver.config.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.UpdateUserNicknameRequestDto;
 import date_naeun.naeunserver.repository.UserRepository;
@@ -22,7 +24,11 @@ public class UserService {
     }
 
     public User findUserById(Long userId) {
-        return userRepository.findOne(userId);
+        try {
+            return userRepository.findOne(userId);
+        } catch (Exception e) {
+            throw new AuthErrorException(AuthErrorStatus.GET_USER_FAILED);
+        }
     }
 
     @Transactional
