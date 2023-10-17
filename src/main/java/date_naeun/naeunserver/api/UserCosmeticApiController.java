@@ -38,19 +38,25 @@ public class UserCosmeticApiController {
     @GetMapping("/api/cosmetic/user")
     public ResultDto<Object> getUserCosmetic(@AuthenticationPrincipal CustomUserDetail userDetail) {
 
-        // 현재 로그인한 유저
-        User user = userService.findUserById(userDetail.getId());
+        try {
+            // 현재 로그인한 유저
+            User user = userService.findUserById(userDetail.getId());
 
-        List<Cosmetic> findCosmetics = userCosmeticService.getCosmeticsForUser(user);
+            List<Cosmetic> findCosmetics = userCosmeticService.getCosmeticsForUser(user);
 
-        // 엔티티 -> DTO 변환
-        if (findCosmetics != null) {
-            List<CosmeticDto> collect = findCosmetics.stream()
-                    .map(c -> new CosmeticDto(c.getId(), c.getName(), c.getBrand(), c.getImage()))
-                    .collect(Collectors.toList());
-            return ResultDto.of(HttpStatusCode.OK, "나의 화장대 리스트 가져오기 성공", collect);
-        } else {
-            return ResultDto.of(HttpStatusCode.OK, "나의 화장대가 비어있습니다.", null);
+            // 엔티티 -> DTO 변환
+            if (findCosmetics != null) {
+                List<CosmeticDto> collect = findCosmetics.stream()
+                        .map(c -> new CosmeticDto(c.getId(), c.getName(), c.getBrand(), c.getImage()))
+                        .collect(Collectors.toList());
+                return ResultDto.of(HttpStatusCode.OK, "나의 화장대 리스트 가져오기 성공", collect);
+            } else {
+                return ResultDto.of(HttpStatusCode.OK, "나의 화장대가 비어있습니다.", null);
+            }
+        } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
         }
     }
 
@@ -68,6 +74,7 @@ public class UserCosmeticApiController {
             userCosmeticService.addCosmeticToUser(user, request.getCosmeticId());
 
             return ResultDto.of(HttpStatusCode.OK, "나의 화장대에 추가하기 성공", null);
+
         } catch (AuthErrorException e) {
             return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
         } catch (Exception e) {

@@ -60,7 +60,7 @@ public class KakaoUserService {
         // Http 응답 (JSON)
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        
+
         try {
             // 카카오 사용자 정보
             Map<String, Object> originAttributes = objectMapper.readValue(response.getBody(), new TypeReference<>() {});

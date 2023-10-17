@@ -1,6 +1,7 @@
 package date_naeun.naeunserver.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import date_naeun.naeunserver.config.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Ingredient;
 import date_naeun.naeunserver.domain.User;
@@ -46,28 +47,34 @@ public class IngredientApiController {
      */
     @GetMapping("/api/ingredient/user")
     public ResultDto<Object> getUserIngr(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestParam boolean isPreference) {
-        User user = user_service.findUserById(userDetail.getId());
+        try {
+            User user = user_service.findUserById(userDetail.getId());
 
-        List<Ingredient> findUserIngr = ingr_service.getIngrForUser(user, isPreference);
+            List<Ingredient> findUserIngr = ingr_service.getIngrForUser(user, isPreference);
 
-        if (findUserIngr != null) {
-            List<IngredientDetailDto> collect = findUserIngr.stream()
-                    .map(IngredientDetailDto::new)
-                    .collect(Collectors.toList());
+            if (findUserIngr != null) {
+                List<IngredientDetailDto> collect = findUserIngr.stream()
+                        .map(IngredientDetailDto::new)
+                        .collect(Collectors.toList());
 
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("ingredients", collect);
-            if(isPreference) {
-                return ResultDto.of(HttpStatusCode.OK, "사용자의 선호성분 가져오기 성공", responseData);
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("ingredients", collect);
+                if (isPreference) {
+                    return ResultDto.of(HttpStatusCode.OK, "사용자의 선호성분 가져오기 성공", responseData);
+                } else {
+                    return ResultDto.of(HttpStatusCode.OK, "사용자의 기피성분 가져오기 성공", responseData);
+                }
             } else {
-                return ResultDto.of(HttpStatusCode.OK, "사용자의 기피성분 가져오기 성공", responseData);
+                if (isPreference) {
+                    return ResultDto.of(HttpStatusCode.OK, "선호 성분이 등록되지 않았습니다.", null);
+                } else {
+                    return ResultDto.of(HttpStatusCode.OK, "기피 성분이 등록되지 않았습니다.", null);
+                }
             }
-        } else {
-            if(isPreference) {
-                return ResultDto.of(HttpStatusCode.OK, "선호 성분이 등록되지 않았습니다.", null);
-            } else {
-                return ResultDto.of(HttpStatusCode.OK, "기피 성분이 등록되지 않았습니다.", null);
-            }
+        } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
         }
 
     }
@@ -78,15 +85,21 @@ public class IngredientApiController {
      */
     @PostMapping("/api/ingredient/user")
     public ResultDto<Object> createUserIngredient(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid AddUserIngrRequest request) {
-        User user = user_service.findUserById(userDetail.getId());
+        try {
+            User user = user_service.findUserById(userDetail.getId());
 
-        ingr_service.addIngrToUser(user, request.isPreference(), request.getAddedIngredient());
-        System.out.println(request.isPreference);
+            ingr_service.addIngrToUser(user, request.isPreference(), request.getAddedIngredient());
+            System.out.println(request.isPreference);
 
-        if(request.isPreference) {
-            return ResultDto.of(HttpStatusCode.OK, "사용자 선호 성분 추가하기 성공", null);
-        } else {
-            return ResultDto.of(HttpStatusCode.OK, "사용자 기피 성분 추가하기 성공", null);
+            if (request.isPreference) {
+                return ResultDto.of(HttpStatusCode.OK, "사용자 선호 성분 추가하기 성공", null);
+            } else {
+                return ResultDto.of(HttpStatusCode.OK, "사용자 기피 성분 추가하기 성공", null);
+            }
+        } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
         }
     }
 
@@ -95,14 +108,20 @@ public class IngredientApiController {
      */
     @PutMapping("/api/ingredient/user")
     public ResultDto<Object> deleteUserIngr(@AuthenticationPrincipal CustomUserDetail userDetail, @RequestBody @Valid DeleteUserIngrRequest request) {
-        User user = user_service.findUserById(userDetail.getId());
+        try {
+            User user = user_service.findUserById(userDetail.getId());
 
-        String responseMsg = ingr_service.deleteIngrList(user, request.isPreference(), request.getDeletedIngr());
+            String responseMsg = ingr_service.deleteIngrList(user, request.isPreference(), request.getDeletedIngr());
 
-        if (responseMsg.equals("")) {
-            return ResultDto.of(HttpStatusCode.OK, "삭제 성공", null);
-        } else {
-            return ResultDto.of(HttpStatusCode.OK, responseMsg, null);
+            if (responseMsg.equals("")) {
+                return ResultDto.of(HttpStatusCode.OK, "삭제 성공", null);
+            } else {
+                return ResultDto.of(HttpStatusCode.OK, responseMsg, null);
+            }
+        } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
         }
     }
 

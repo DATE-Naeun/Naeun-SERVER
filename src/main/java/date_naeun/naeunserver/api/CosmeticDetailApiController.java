@@ -1,5 +1,6 @@
 package date_naeun.naeunserver.api;
 
+import date_naeun.naeunserver.config.exception.AuthErrorException;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;
@@ -34,31 +35,34 @@ public class CosmeticDetailApiController {
     @GetMapping("/api/cosmetic/detail/{cosmeticId}")
     public ResultDto<Object> getCosmeticDetail(@AuthenticationPrincipal CustomUserDetail userDetail, @PathVariable Long cosmeticId) {
 
-        // 로그인한 회원 정보
-        User user = userService.findUserById(userDetail.getId());
+        try {
+            // 로그인한 회원 정보
+            User user = userService.findUserById(userDetail.getId());
 
-        // 화장품 가져오기
-        Cosmetic cosmetic = cosmeticService.getCosmeticInfo(cosmeticId);
+            // 화장품 가져오기
+            Cosmetic cosmetic = cosmeticService.getCosmeticInfo(cosmeticId);
 
-        // 성분리스트 가져오기
-        List<Ingredient> ingreList = ingrService.findIngrList(cosmetic);
+            // 성분리스트 가져오기
+            List<Ingredient> ingreList = ingrService.findIngrList(cosmetic);
 
-        if (ingreList == null) {
-            return ResultDto.of(HttpStatusCode.OK, "성분 리스트가 비어 있습니다.", null);
+            // 성분 Detail 리스트
+            List<IngredientDetailDto> ingr_collect = ingreList.stream()
+                    .map(IngredientDetailDto::new)
+                    .collect(Collectors.toList());
+
+            CosmeticDetailDto collect = new CosmeticDetailDto(cosmetic, ingr_collect);
+
+            // 나의 화장대에 있는 화장품인지 확인
+            if (user.getUserCosmeticList().contains(cosmeticId)) {
+                collect.setIsUserCosmetic(Boolean.TRUE);
+            }
+
+            return ResultDto.of(HttpStatusCode.OK, "화장품 상세 정보 가져오기 성공", collect);
+
+        } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
         }
-
-        // 성분 Detail 리스트
-        List<IngredientDetailDto> ingr_collect = ingreList.stream()
-                .map(IngredientDetailDto::new)
-                .collect(Collectors.toList());
-
-        CosmeticDetailDto collect = new CosmeticDetailDto(cosmetic, ingr_collect);
-
-        // 나의 화장대에 있는 화장품인지 확인
-        if (user.getUserCosmeticList().contains(cosmeticId)) {
-            collect.setIsUserCosmetic(Boolean.TRUE);
-        }
-
-        return ResultDto.of(HttpStatusCode.OK, "화장품 상세 정보 가져오기 성공", collect);
     }
 }
