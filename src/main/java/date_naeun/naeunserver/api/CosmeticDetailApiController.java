@@ -7,17 +7,16 @@ import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.CosmeticDetailDto;
 import date_naeun.naeunserver.dto.IngredientDetailDto;
 import date_naeun.naeunserver.dto.ResultDto;
+import date_naeun.naeunserver.exception.HttpStatusCode;
 import date_naeun.naeunserver.service.CosmeticService;
 import date_naeun.naeunserver.service.IngredientService;
 import date_naeun.naeunserver.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +34,8 @@ public class CosmeticDetailApiController {
     @GetMapping("/api/cosmetic/detail/{cosmeticId}")
     public ResultDto<Object> getCosmeticDetail(@AuthenticationPrincipal CustomUserDetail userDetail, @PathVariable Long cosmeticId) {
 
-        // Request Header에서 accessToken 값을 추출
-        User user = getUser(userDetail);
+        // 로그인한 회원 정보
+        User user = userService.findUserById(userDetail.getId());
 
         // 화장품 가져오기
         Cosmetic cosmetic = cosmeticService.getCosmeticInfo(cosmeticId);
@@ -45,7 +44,7 @@ public class CosmeticDetailApiController {
         List<Ingredient> ingreList = ingrService.findIngrList(cosmetic);
 
         if (ingreList == null) {
-            return ResultDto.of(HttpStatus.OK, "성분 리스트가 비어 있습니다.", null);
+            return ResultDto.of(HttpStatusCode.OK, "성분 리스트가 비어 있습니다.", null);
         }
 
         // 성분 Detail 리스트
@@ -60,18 +59,6 @@ public class CosmeticDetailApiController {
             collect.setIsUserCosmetic(Boolean.TRUE);
         }
 
-        return ResultDto.of(HttpStatus.OK, "화장품 상세 정보 가져오기 성공", collect);
-    }
-
-
-    /**
-     * JWT 토큰으로 사용자를 받아오는 메서드
-     */
-    private User getUser(CustomUserDetail userDetail) {
-        if (userDetail == null) {
-            throw new EntityNotFoundException("해당 토큰으로 사용자를 조회할 수 없습니다.");
-        }
-        // accessToken 검증 후 생성된 userDetail의 id로 user 찾아서 생성
-        return userService.findUserById(userDetail.getId());
+        return ResultDto.of(HttpStatusCode.OK, "화장품 상세 정보 가져오기 성공", collect);
     }
 }

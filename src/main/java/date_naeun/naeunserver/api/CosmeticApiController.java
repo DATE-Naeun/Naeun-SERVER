@@ -3,11 +3,11 @@ package date_naeun.naeunserver.api;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.dto.CosmeticDto;
 import date_naeun.naeunserver.dto.ResultDto;
+import date_naeun.naeunserver.exception.HttpStatusCode;
 import date_naeun.naeunserver.service.CosmeticService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class CosmeticApiController {
     public ResultDto<CreateCosmeticFromPhotoResponseDto> createCosmeticFromPhoto(@RequestBody CreateCosmeticFromPhotoRequestDto createCosmeticFromPhotoRequestDto) {
         Long cosmeticId = cosmeticService.createCosmeticFromPhoto(createCosmeticFromPhotoRequestDto.cosmeticName, createCosmeticFromPhotoRequestDto.brand,
                 createCosmeticFromPhotoRequestDto.category, createCosmeticFromPhotoRequestDto.ingredients).getId();
-        return ResultDto.of(HttpStatus.CREATED, "촬영으로 비교할 화장품 추가하기 성공", new CreateCosmeticFromPhotoResponseDto(cosmeticId));
+        return ResultDto.of(HttpStatusCode.CREATED, "촬영으로 비교할 화장품 추가하기 성공", new CreateCosmeticFromPhotoResponseDto(cosmeticId));
     }
 
     @Data
@@ -47,6 +47,6 @@ public class CosmeticApiController {
                 .map(CosmeticDto::new)
                 .collect(Collectors.toList());
 
-        return ResultDto.of(HttpStatus.OK, "화장품 검색 결과 가져오기 성공", collect);
+        return ResultDto.of(HttpStatusCode.OK, "화장품 검색 결과 가져오기 성공", collect);
     }
 }
