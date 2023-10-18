@@ -5,12 +5,12 @@ import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.CosmeticComparisonDto;
 import date_naeun.naeunserver.dto.ResultDto;
+import date_naeun.naeunserver.exception.HttpStatusCode;
 import date_naeun.naeunserver.repository.ComparisonQueryRepository;
 import date_naeun.naeunserver.service.HistoryService;
 import date_naeun.naeunserver.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +36,9 @@ public class ComparisonApiController {
         List<CosmeticComparisonDto> result = cosmetics.stream()
                 .map(CosmeticComparisonDto::new)
                 .collect(toList());
+      
         historyService.saveHistory(user, cosmetics);
-        return ResultDto.of(HttpStatus.OK, "화장품 비교 결과 가져오기 성공", result);
+        return ResultDto.of(HttpStatusCode.OK, "화장품 비교 결과 가져오기 성공", result);
     }
 
     @Data
@@ -56,7 +57,7 @@ public class ComparisonApiController {
                 .map(CosmeticComparisonDto::new)
                 .collect(toList());
 
-        return ResultDto.of(HttpStatus.OK, "피부타입&카테고리별 알고리즘 추천 화장품 리스트 가져오기 성공", result);
+        return ResultDto.of(HttpStatusCode.OK, "피부타입&카테고리별 알고리즘 추천 화장품 리스트 가져오기 성공", result);
     }
 
     /**

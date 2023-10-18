@@ -1,5 +1,7 @@
 package date_naeun.naeunserver.config.jwt;
 
+import date_naeun.naeunserver.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,7 @@ public class CustomUserDetailService implements UserDetailsService {
     public CustomUserDetail loadUserByUsername(String email) throws UsernameNotFoundException {
         User findUser = userRepository.findByEmail(email);
         if (findUser == null) {
-            throw new UsernameNotFoundException("해당 사용자를 찾을 수 없습니다.");
+            throw new AuthErrorException(AuthErrorStatus.GET_USER_FAILED);
         } else {
             return new CustomUserDetail(findUser);
         }

@@ -2,6 +2,8 @@ package date_naeun.naeunserver.service;
 
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.exception.ApiErrorStatus;
+import date_naeun.naeunserver.exception.UserCosmeticErrorException;
 import date_naeun.naeunserver.repository.CosmeticRepository;
 import date_naeun.naeunserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,35 +61,34 @@ public class UserCosmeticService {
      * - 사용자와 삭제할 화장품 리스트를 받아서 삭제
      */
     @Transactional
-    public String deleteCosmeticToUser(User user, List<Long> cosmeticIdList) {
+    public void deleteCosmeticToUser(User user, List<Long> cosmeticIdList) {
         List<Long> cosmeticList= user.getUserCosmeticList();
 
         if (cosmeticIdList.isEmpty()) {
-            return "화장품 list가 없습니다.";
+            throw new UserCosmeticErrorException(ApiErrorStatus.LIST_NOT_EXIST, 0L);
         }
         else {
             for (Object item : cosmeticIdList) {
                 // 화장품 id가 유효하지 않은 경우
+
                 if (!(item instanceof Long)) {
-                    return item + "가 정수가 아닙니다.";
+                    throw new UserCosmeticErrorException(ApiErrorStatus.NOT_INTEGER, item);
                 }
                 // 화장품 id가 존재하지 않는 경우: db에 존재하지 않음.
                 if (!cosmeticList.contains(item)) {
-                    return item + "가 존재하지 않습니다.";
+                    throw new UserCosmeticErrorException(ApiErrorStatus.NOT_EXIST, item);
                 }
                 // 중복된 id가 들어온 경우
                 if (cosmeticIdList.indexOf(item) != cosmeticIdList.lastIndexOf(item)) {
-                    return item + "가 중복되었습니다.";
+                    throw new UserCosmeticErrorException(ApiErrorStatus.DUPLICATED_ID, item);
                 }
             }
+
             // 나의 화장대에 있는 화장품 id인지 확인 후 삭제
             if (cosmeticList.containsAll(cosmeticIdList)) {
                 cosmeticList.removeAll(cosmeticIdList);
                 user.setUserCosmeticList(cosmeticList);
                 userRepository.updateUserCosmetic(user);  // 변경 내용을 db에 반영
-                return "";
-            } else {
-                return "서버 에러";
             }
         }
     }

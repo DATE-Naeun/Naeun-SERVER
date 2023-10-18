@@ -1,7 +1,11 @@
     package date_naeun.naeunserver.config.jwt;
 
-    import date_naeun.naeunserver.config.exception.TokenStatus;
-    import date_naeun.naeunserver.config.exception.TokenErrorException;
+    import date_naeun.naeunserver.exception.AuthErrorException;
+    import date_naeun.naeunserver.exception.AuthErrorStatus;
+    import date_naeun.naeunserver.domain.RefreshToken;
+    import date_naeun.naeunserver.domain.User;
+    import date_naeun.naeunserver.repository.RefreshTokenRepository;
+    import date_naeun.naeunserver.repository.UserRepository;
     import io.jsonwebtoken.*;
     import io.jsonwebtoken.security.Keys;
     import lombok.RequiredArgsConstructor;
@@ -30,7 +34,8 @@
 
         private static final Long accessTokenValidationTime = 30 * 60 * 1000L;   //30분
 
-        private static final Long refreshTokenValidationTime = 7 * 24 * 60 * 60 * 1000 * 3L;  // 3주
+        private final UserRepository userRepository;
+        private final RefreshTokenRepository refreshTokenRepository;
 
         private final CustomUserDetailService userDetailService;
 
@@ -44,7 +49,6 @@
          */
         public String generateAccessToken(Map<String, Object> claims,
                                           String subject) {
-            log.info("secret key = {}", secretKey);
             //토큰 생성시간
             Instant now = Instant.from(OffsetDateTime.now());
 
@@ -59,17 +63,32 @@
 
         /**
          * Refresh Token 생성 메서드
-         * - Access Token이 만료되었을 경우 생성
+         * - Access Token이 만료되었을 경우 이것으로 Access Token 재발급
          */
-        public String generateRefreshToken(String subject) {
-            //토큰 생성시간
-            Instant now = Instant.from(OffsetDateTime.now());
+        public String generateRefreshToken(Long userId) {
+            // refresh token 생성
+            RefreshToken refreshToken = new RefreshToken(UUID.randomUUID().toString(), userId);
+            // db 저장
+            refreshTokenRepository.save(refreshToken);
 
-            return Jwts.builder()
-                    .setSubject(subject)
-                    .setExpiration(Date.from(now.plusMillis(refreshTokenValidationTime)))
-                    .signWith(secretKey)
-                    .compact();
+            return refreshToken.getRefreshToken();
+        }
+
+        /**
+         * 리프레시 토큰으로 액세스 토큰 재발급
+         */
+        public String reAccessToken(String token) {
+
+            RefreshToken refreshToken = refreshTokenRepository.findById(token);
+
+            Long userId = refreshToken.getUserId();
+            User user = userRepository.findOne(userId);
+
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("id", userId);
+            claims.put("role", user.getRole());
+
+            return generateAccessToken(claims, user.getEmail());
         }
 
         /**
@@ -90,20 +109,15 @@
                 Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
                 return true;
             } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-                throw new TokenErrorException(TokenStatus.INVALID_TOKEN); // 잘못된 토큰
+                throw new AuthErrorException(AuthErrorStatus.INVALID_TOKEN); // 잘못된 토큰
             } catch (ExpiredJwtException e) {
-                throw new TokenErrorException(TokenStatus.EXPIRED_TOKEN); // 만료된 토큰
+                throw new AuthErrorException(AuthErrorStatus.EXPIRED_TOKEN); // 만료된 토큰
             } catch (UnsupportedJwtException e) {
                 log.error("지원되지 않는 토큰입니다.");
             } catch (IllegalArgumentException e) {
                 log.error("잘못된 JWT 토큰입니다.");
             }
             return false;
-        }
-
-        public Date getExpireMin(String token) {
-            return getTokenBody(token)
-                    .getExpiration();
         }
 
         /**

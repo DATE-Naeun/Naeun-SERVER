@@ -6,13 +6,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import date_naeun.naeunserver.config.jwt.JwtProvider;
 import date_naeun.naeunserver.config.jwt.dto.TokenDto;
-import date_naeun.naeunserver.config.exception.AuthErrorException;
-import date_naeun.naeunserver.config.exception.AuthErrorStatus;
+import date_naeun.naeunserver.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.Role;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.external.client.kakao.dto.KakaoUserInfo;
 import date_naeun.naeunserver.repository.UserRepository;
-import date_naeun.naeunserver.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -33,7 +32,6 @@ public class KakaoUserService {
 
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenService refreshTokenService;
 
     /**
      * 카카오 액세스 토큰으로 카카오 사용자 정보 받아오는 메서드
@@ -63,23 +61,20 @@ public class KakaoUserService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        // 카카오 사용자 정보
-        Map<String, Object> originAttributes = null;
-
         try {
-            originAttributes = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
+            // 카카오 사용자 정보
+            Map<String, Object> originAttributes = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
 
             if (originAttributes.containsKey("code") && originAttributes.get("code").equals(-401)) {
                 // 토큰이 만료된 경우 예외 처리
                 throw new AuthErrorException(AuthErrorStatus.SOCIAL_TOKEN_EXPIRED);
             }
+            return new KakaoUserInfo(originAttributes);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-        if (originAttributes == null) throw new AuthErrorException(AuthErrorStatus.GETUSER_FAILED);
-
-        return new KakaoUserInfo(originAttributes);
+        return null;
     }
 
     /**
@@ -121,7 +116,7 @@ public class KakaoUserService {
         // Access Token 생성
         String accessToken = delegateAccessToken(user.getId(), user.getEmail(), user.getRole());
         // Refresh Token 생성
-        String refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getId());
         return new TokenDto(type, accessToken, refreshToken);
     }
 
