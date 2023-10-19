@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -50,8 +51,8 @@ public class CosmeticRepository {
         List<Cosmetic> cosmetics = em.createQuery("select hc.cosmetic from HistoryCosmetic hc where hc.history = :history", Cosmetic.class)
                 .setParameter("history", history)
                 .getResultList();
-        if (cosmetics.isEmpty()) {
-            throw new EntityNotFoundException("비교기록에 화장품이 없습니다.");
+        if (cosmetics == null || cosmetics.isEmpty()) {
+            return new ArrayList<>();
         }
         return cosmetics;
     }
