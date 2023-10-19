@@ -3,7 +3,7 @@ package date_naeun.naeunserver.service;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.exception.ApiErrorStatus;
-import date_naeun.naeunserver.exception.UserCosmeticErrorException;
+import date_naeun.naeunserver.exception.ApiErrorWithItemException;
 import date_naeun.naeunserver.repository.CosmeticRepository;
 import date_naeun.naeunserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 나의 화장대 서비스
@@ -33,8 +37,8 @@ public class UserCosmeticService {
         // User 엔티티로부터 화장품 ID 목록을 얻음
         List<Long> cosmeticIds = user.getUserCosmeticList();
 
-        // 나의 화장대가 비어있는 경우 null 반환
-        if (cosmeticIds.isEmpty()) return null;
+        // 나의 화장대가 비어있는 경우 빈 리스트 반환
+        if (cosmeticIds.isEmpty()) return new ArrayList<>();
 
         // 화장품 ID 목록을 사용하여 단일 쿼리로 화장품 정보를 가져옴
         return cosmeticRepository.findAllById(cosmeticIds);
@@ -61,35 +65,41 @@ public class UserCosmeticService {
      * - 사용자와 삭제할 화장품 리스트를 받아서 삭제
      */
     @Transactional
-    public void deleteCosmeticToUser(User user, List<Long> cosmeticIdList) {
+    public void deleteCosmeticToUser(User user, List<Object> cosmeticIdList) {
         List<Long> cosmeticList= user.getUserCosmeticList();
 
-        if (cosmeticIdList.isEmpty()) {
-            throw new UserCosmeticErrorException(ApiErrorStatus.LIST_NOT_EXIST, 0L);
+        List<Long> cosmeticLongIdList = cosmeticIdList.stream()
+                .map(this::convertToLongOrThrow)
+                .collect(Collectors.toList());
+
+        // 나의 화장대에 있는 id인지 확인
+        cosmeticLongIdList.forEach(itemId -> {
+            if (!cosmeticList.contains(itemId)) {
+                throw new ApiErrorWithItemException(ApiErrorStatus.NOT_EXIST, itemId);
+            }
+        });
+
+        // 중복되는 id 확인
+        Set<Long> uniqueIds = new HashSet<>();
+        for (Long itemId : cosmeticLongIdList) {
+            if (!uniqueIds.add(itemId)) {
+                throw new ApiErrorWithItemException(ApiErrorStatus.DUPLICATED_ID, itemId);
+            }
         }
-        else {
-            for (Object item : cosmeticIdList) {
-                // 화장품 id가 유효하지 않은 경우
 
-                if (!(item instanceof Long)) {
-                    throw new UserCosmeticErrorException(ApiErrorStatus.NOT_INTEGER, item);
-                }
-                // 화장품 id가 존재하지 않는 경우: db에 존재하지 않음.
-                if (!cosmeticList.contains(item)) {
-                    throw new UserCosmeticErrorException(ApiErrorStatus.NOT_EXIST, item);
-                }
-                // 중복된 id가 들어온 경우
-                if (cosmeticIdList.indexOf(item) != cosmeticIdList.lastIndexOf(item)) {
-                    throw new UserCosmeticErrorException(ApiErrorStatus.DUPLICATED_ID, item);
-                }
-            }
+        // Remove the cosmetics if all checks pass
+        cosmeticList.removeAll(cosmeticLongIdList);
+        user.setUserCosmeticList(cosmeticList);
+        userRepository.updateUserCosmetic(user);  // Update the database
+    }
 
-            // 나의 화장대에 있는 화장품 id인지 확인 후 삭제
-            if (cosmeticList.containsAll(cosmeticIdList)) {
-                cosmeticList.removeAll(cosmeticIdList);
-                user.setUserCosmeticList(cosmeticList);
-                userRepository.updateUserCosmetic(user);  // 변경 내용을 db에 반영
-            }
+    private Long convertToLongOrThrow(Object obj) {
+        if (obj instanceof Long) {
+            return (Long) obj;
+        } else if (obj instanceof Integer) {
+            return ((Integer) obj).longValue();
+        } else {
+            throw new ApiErrorWithItemException(ApiErrorStatus.NOT_INTEGER, obj);
         }
     }
 }
