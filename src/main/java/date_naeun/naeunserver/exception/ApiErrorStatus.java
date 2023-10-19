@@ -39,7 +39,22 @@ public enum ApiErrorStatus {
     /**
      * searchCosmetic Api 관련 에러 코드
      */
-    CSMT_NOT_RESULT(HttpStatusCode.BAD_REQUEST, "검색 결과가 없습니다.");
+    CSMT_NOT_RESULT(HttpStatusCode.BAD_REQUEST, "검색 결과가 없습니다."),
+
+    /**
+     * 화장품 리뷰 Api 관련 에러 코드
+     */
+    REVIEW_NOT_RATING(HttpStatusCode.BAD_REQUEST, "별점이 없습니다."),
+    REVIEW_NOT_CONTENT(HttpStatusCode.BAD_REQUEST, "리뷰 내용이 없습니다."),
+    REVIEW_NOT_TEXTURE(HttpStatusCode.BAD_REQUEST, "발림성이 없습니다."),
+    REVIEW_NOT_REPURCHASE(HttpStatusCode.BAD_REQUEST, "재구매의사가 없습니다."),
+
+    /**
+     * skinType Api 관련 에러 코드
+     */
+    SKINTYPE_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "스킨타입이 없습니다."),
+    SKINTYPE_NOT_VALID(HttpStatusCode.BAD_REQUEST, "유효하지 않은 스킨타입입니다.");
+
 
     private final HttpStatusCode code;
     private final String msg;
