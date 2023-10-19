@@ -34,14 +34,11 @@ public class HistoryApiController {
      * 이전 화장품 비교기록 가져오기
      */
     @GetMapping("/api/comparison/history")
-    public ResultDto<List<HistoryDto>> getComparisonCosmetic(@AuthenticationPrincipal CustomUserDetail userDetail) {
+    public ResultDto<List<HistoryDto>> getComparisonHistory(@AuthenticationPrincipal CustomUserDetail userDetail) {
 
         try {
             // 로그인한 사용자 가져오기
             User user = userService.findUserById(userDetail.getId());
-
-            // 비교기록 저장 (sample)
-            historyService.saveHistory(user);
 
             // 비교기록 가져오기
             List<History> findHistories = historyService.getHistoryList(user);
