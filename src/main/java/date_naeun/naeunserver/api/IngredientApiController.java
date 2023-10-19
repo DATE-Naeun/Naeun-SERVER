@@ -1,13 +1,12 @@
 package date_naeun.naeunserver.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import date_naeun.naeunserver.exception.AuthErrorException;
+import date_naeun.naeunserver.exception.*;
 import date_naeun.naeunserver.config.jwt.CustomUserDetail;
 import date_naeun.naeunserver.domain.Ingredient;
 import date_naeun.naeunserver.domain.User;
 import date_naeun.naeunserver.dto.IngredientDetailDto;
 import date_naeun.naeunserver.dto.ResultDto;
-import date_naeun.naeunserver.exception.HttpStatusCode;
 import date_naeun.naeunserver.service.IngredientService;
 import date_naeun.naeunserver.service.UserService;
 import lombok.Data;
@@ -17,9 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,14 +28,24 @@ public class IngredientApiController {
 
     @GetMapping("/api/ingredient/search")
     public ResultDto<Map<String, Object>> ingr(@RequestParam String keyword) {
-        List<Ingredient> findIngr = ingr_service.findOneIngr(keyword);
-        List<IngredientDetailDto> collect = findIngr.stream()
-                .map(IngredientDetailDto::new)
-                .collect(Collectors.toList());
+        try {
+            List<Ingredient> findIngr = ingr_service.findOneIngr(keyword);
 
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("ingredients", collect);
-        return ResultDto.of(HttpStatusCode.OK, "성분 검색 결과 가져오기 성공", responseData);
+            if (findIngr.isEmpty()) {
+                throw new ApiErrorException(ApiErrorStatus.INGR_NOT_RESULT);
+            }
+            List<IngredientDetailDto> collect = findIngr.stream()
+                    .map(IngredientDetailDto::new)
+                    .collect(Collectors.toList());
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("ingredients", collect);
+            return ResultDto.of(HttpStatusCode.OK, "성분 검색 결과 가져오기 성공", responseData);
+        } catch (ApiErrorException e){
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
+        }
     }
 
     /**
@@ -66,12 +73,14 @@ public class IngredientApiController {
                 }
             } else {
                 if (isPreference) {
-                    return ResultDto.of(HttpStatusCode.OK, "선호 성분이 등록되지 않았습니다.", null);
+                    throw new ApiErrorException(ApiErrorStatus.INGR_PREFER_NOT_EXIST);
                 } else {
-                    return ResultDto.of(HttpStatusCode.OK, "기피 성분이 등록되지 않았습니다.", null);
+                    throw new ApiErrorException(ApiErrorStatus.INGR_DISLIKE_NOT_EXIST);
                 }
             }
         } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (ApiErrorException e) {
             return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
         } catch (Exception e) {
             return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
@@ -88,19 +97,48 @@ public class IngredientApiController {
         try {
             User user = user_service.findUserById(userDetail.getId());
 
+            List<Ingredient> findAll = ingr_service.findAllIngr();
+            List<Long> allIngrIds = findAll.stream()
+                    .map(Ingredient::getId)
+                    .collect(Collectors.toList());
+
+            // 성분 list가 없는 경우
+            if (request.addedIngredient.isEmpty()) {
+                throw new ApiErrorException(ApiErrorStatus.INGR_LIST_NOT_EXIST);
+            }
+
+            for (Long id : request.getAddedIngredient()) {
+                // 입력받은 id가 정수가 아닌 경우
+                if (!isPositiveInteger(id)) {
+                    throw new ApiErrorWithItemException(ApiErrorStatus.INGR_NOT_INTEGER, id);
+                }
+
+                if (!allIngrIds.contains(id)) {
+                    throw new ApiErrorWithItemException(ApiErrorStatus.INGR_ID_NOT_EXIST, id);
+                }
+            }
+
             ingr_service.addIngrToUser(user, request.isPreference(), request.getAddedIngredient());
             System.out.println(request.isPreference);
 
             if (request.isPreference) {
-                return ResultDto.of(HttpStatusCode.OK, "사용자 선호 성분 추가하기 성공", null);
+                return ResultDto.of(HttpStatusCode.CREATED, "사용자 선호 성분 추가하기 성공", null);
             } else {
-                return ResultDto.of(HttpStatusCode.OK, "사용자 기피 성분 추가하기 성공", null);
+                return ResultDto.of(HttpStatusCode.CREATED, "사용자 기피 성분 추가하기 성공", null);
             }
         } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (ApiErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (ApiErrorWithItemException e) {
             return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
         } catch (Exception e) {
             return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
         }
+    }
+    private boolean isPositiveInteger(Long value) {
+        // Long 데이터가 null 또는 0보다 작거나 같으면 정수가 아닌 것으로 판별
+        return value != null && value > 0;
     }
 
     /**
@@ -111,14 +149,14 @@ public class IngredientApiController {
         try {
             User user = user_service.findUserById(userDetail.getId());
 
-            String responseMsg = ingr_service.deleteIngrList(user, request.isPreference(), request.getDeletedIngr());
+            ingr_service.deleteIngrList(user, request.isPreference(),request.getDeletedIngr());
 
-            if (responseMsg.equals("")) {
-                return ResultDto.of(HttpStatusCode.OK, "삭제 성공", null);
-            } else {
-                return ResultDto.of(HttpStatusCode.OK, responseMsg, null);
-            }
+            return ResultDto.of(HttpStatusCode.OK, "삭제 성공", null);
         } catch (AuthErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (ApiErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (ApiErrorWithItemException e) {
             return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
         } catch (Exception e) {
             return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
