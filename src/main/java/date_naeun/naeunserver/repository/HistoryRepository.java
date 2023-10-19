@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -29,8 +29,8 @@ public class HistoryRepository {
                 .setParameter("user", user)
                 .getResultList();
 
-        if (histories.isEmpty()) {
-            throw new EntityNotFoundException("사용자의 비교기록이 없습니다.");
+        if (histories == null || histories.isEmpty()) {
+            return new ArrayList<>();
         }
         return histories;
     }

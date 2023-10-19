@@ -24,11 +24,6 @@ public class HistoryService {
         return historyRepository.findAllByUser(user);
     }
 
-    /**
-     * [To Do]
-     * 비교기록 저장하는 메서드 수정
-     * 일단 샘플로 넣어둠.
-     */
     public void saveHistory(User user, List<Cosmetic> cosmetics) {
         History history = new History(user, cosmetics);
         historyRepository.save(history);
