@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,10 @@ public class ReviewService {
             totalRating += review.getRating();
         }
 
-        return totalRating / reviews.size();
+        Double avgRating = totalRating / reviews.size();
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Double.parseDouble(df.format(avgRating));
     }
 
     /**
@@ -138,7 +142,10 @@ public class ReviewService {
                 .filter(review -> "할래요".equals(review.getRepurchase()))
                 .count();
 
-        return ((double) repurchaseCount / totalReviews) * 100.0;
+        Double repurchaseRating = ((double) repurchaseCount / totalReviews) * 100.0;
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Double.parseDouble(df.format(repurchaseRating));
     }
 
     /**
