@@ -50,11 +50,6 @@ public class HistoryApiController {
                 // 비교 화장품 가져오기
                 List<Cosmetic> cosmetics = cosmeticService.getCosmeticsByHistory(history);
 
-                // 화장품 리스트가 비어 있는 경우
-                if (cosmetics == null) {
-                    return ResultDto.of(HttpStatusCode.OK, "비교했던 화장품이 없습니다.", null);
-                }
-
                 // 비교했던 화장품을 dto에 담는다.
                 List<HistoryCosmeticDto> cosmeticDtos = cosmetics.stream()
                         .map(HistoryCosmeticDto::new)
