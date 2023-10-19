@@ -3,6 +3,8 @@ package date_naeun.naeunserver.api;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.dto.CosmeticDto;
 import date_naeun.naeunserver.dto.ResultDto;
+import date_naeun.naeunserver.exception.ApiErrorException;
+import date_naeun.naeunserver.exception.ApiErrorStatus;
 import date_naeun.naeunserver.exception.HttpStatusCode;
 import date_naeun.naeunserver.service.CosmeticService;
 import lombok.AllArgsConstructor;
@@ -42,11 +44,21 @@ public class CosmeticApiController {
 
     @GetMapping("/api/cosmetic/search")
     public ResultDto<List<CosmeticDto>> searchCosmetic(@RequestParam String keyword) {
-        List<Cosmetic> findCosmetic = cosmeticService.findByKeyword(keyword);
-        List<CosmeticDto> collect = findCosmetic.stream()
-                .map(CosmeticDto::new)
-                .collect(Collectors.toList());
+        try {
+            List<Cosmetic> findCosmetic = cosmeticService.findByKeyword(keyword);
 
-        return ResultDto.of(HttpStatusCode.OK, "화장품 검색 결과 가져오기 성공", collect);
+            if (findCosmetic.isEmpty()) {
+                throw new ApiErrorException(ApiErrorStatus.CSMT_NOT_RESULT);
+            }
+            List<CosmeticDto> collect = findCosmetic.stream()
+                    .map(CosmeticDto::new)
+                    .collect(Collectors.toList());
+
+            return ResultDto.of(HttpStatusCode.OK, "화장품 검색 결과 가져오기 성공", collect);
+        } catch (ApiErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
+        }
     }
 }
