@@ -3,16 +3,16 @@ package date_naeun.naeunserver.service;
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.Ingredient;
 import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.exception.ApiErrorException;
+import date_naeun.naeunserver.exception.ApiErrorStatus;
+import date_naeun.naeunserver.exception.ApiErrorWithItemException;
 import date_naeun.naeunserver.repository.IngredientRepository;
 import date_naeun.naeunserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class IngredientService {
      * 전체 성분 조회
      */
     public List<Ingredient> findAllIngr() {
-        return ingr_repository.findALl();
+        return ingr_repository.findAll();
     }
 
     /**
@@ -64,6 +64,8 @@ public class IngredientService {
             for ( Long item : newIngrId) {
                 if (!preferIngrList.contains(item)) {
                     preferIngrList.add(item);
+                } else {
+                    throw new ApiErrorWithItemException(ApiErrorStatus.INGR_DUPLICATED_ID, item);
                 }
             }
 
@@ -76,6 +78,8 @@ public class IngredientService {
             for ( Long item : newIngrId ) {
                 if (!dislikeIngrList.contains(item)) {
                     dislikeIngrList.add(item);
+                } else {
+                    throw new ApiErrorWithItemException(ApiErrorStatus.INGR_DUPLICATED_ID, item);
                 }
             }
 
@@ -88,58 +92,52 @@ public class IngredientService {
      * 선호/기피성분 삭제
      */
     @Transactional
-    public String deleteIngrList(User user, boolean isPreference, List<Long> ingrIdList) {
+    public void deleteIngrList(User user, boolean isPreference, List<Long> ingrIdList) {
         List<Long> preferIngrList = user.getPreferIngrList();
         List<Long> dislikeIngrList = user.getDislikeIngrList();
 
         if (isPreference == true) { //선호 성분
             if(preferIngrList.isEmpty()) {
-                return "성분 list가 없습니다.";
+                throw new ApiErrorException(ApiErrorStatus.INGR_LIST_NOT_EXIST);
             }
             else {
                 for (Object item : ingrIdList) {
                     if (!(item instanceof Long)) {
-                        return item + "가 정수가 아닙니다.";
+                        throw new ApiErrorWithItemException(ApiErrorStatus.INGR_NOT_INTEGER, item);
                     }
                     if (!preferIngrList.contains(item)) {
-                        return item + "가 존재하지 않습니다.";
+                        throw new ApiErrorWithItemException(ApiErrorStatus.INGR_ID_NOT_EXIST, item);
                     }
                     if (ingrIdList.indexOf(item) != ingrIdList.lastIndexOf(item)) {
-                        return item + "가 중복되었습니다.";
+                        throw new ApiErrorWithItemException(ApiErrorStatus.INGR_DUPLICATED_ID, item);
                     }
                 }
                 if (preferIngrList.containsAll(ingrIdList)) {
                     preferIngrList.removeAll(ingrIdList);
                     user.setPreferIngrList(preferIngrList);
                     user_repository.updatePreferIngr(user);
-                    return "";
-                } else {
-                    return "서버 에러";
                 }
             }
         } else {    //기피 성분
             if(dislikeIngrList.isEmpty()) {
-                return "성분 list가 없습니다.";
+                throw new ApiErrorException(ApiErrorStatus.INGR_LIST_NOT_EXIST);
             }
             else {
                 for (Object item : ingrIdList) {
                     if (!(item instanceof Long)) {
-                        return item + "가 정수가 아닙니다.";
+                        throw new ApiErrorWithItemException(ApiErrorStatus.INGR_NOT_INTEGER, item);
                     }
                     if (!dislikeIngrList.contains(item)) {
-                        return item + "가 존재하지 않습니다.";
+                        throw new ApiErrorWithItemException(ApiErrorStatus.INGR_ID_NOT_EXIST, item);
                     }
                     if (ingrIdList.indexOf(item) != ingrIdList.lastIndexOf(item)) {
-                        return item + "가 중복되어습니다.";
+                        throw new ApiErrorWithItemException(ApiErrorStatus.INGR_DUPLICATED_ID, item);
                     }
                 }
                 if (dislikeIngrList.containsAll(ingrIdList)) {
                     dislikeIngrList.removeAll(ingrIdList);
                     user.setDislikeIngrList(dislikeIngrList);
                     user_repository.updateDislikeIngr(user);
-                    return "";
-                } else {
-                    return "서버 에러";
                 }
             }
         }
