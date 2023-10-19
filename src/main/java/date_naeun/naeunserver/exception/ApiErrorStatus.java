@@ -48,6 +48,7 @@ public enum ApiErrorStatus {
     REVIEW_NOT_CONTENT(HttpStatusCode.BAD_REQUEST, "리뷰 내용이 없습니다."),
     REVIEW_NOT_TEXTURE(HttpStatusCode.BAD_REQUEST, "발림성이 없습니다."),
     REVIEW_NOT_REPURCHASE(HttpStatusCode.BAD_REQUEST, "재구매의사가 없습니다."),
+    REVIEW_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "등록된 리뷰가 없습니다."),
 
     /**
      * skinType Api 관련 에러 코드
