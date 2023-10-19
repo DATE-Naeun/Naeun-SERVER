@@ -34,7 +34,12 @@ public enum ApiErrorStatus {
     INGR_DUPLICATED_ID(HttpStatusCode.BAD_REQUEST, "가 중복되었습니다."),
     INGR_ID_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "가 존재하지 않습니다."),
     INGR_PREFER_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "선호 성분이 등록되지 않았습니다."),
-    INGR_DISLIKE_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "기피 성분이 등록되지 않았습니다.");
+    INGR_DISLIKE_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "기피 성분이 등록되지 않았습니다."),
+
+    /**
+     * searchCosmetic Api 관련 에러 코드
+     */
+    CSMT_NOT_RESULT(HttpStatusCode.BAD_REQUEST, "검색 결과가 없습니다.");
 
     private final HttpStatusCode code;
     private final String msg;
