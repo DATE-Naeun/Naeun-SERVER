@@ -24,14 +24,18 @@ public class CosmeticService {
 
     public Cosmetic createCosmeticFromPhoto(String name, String brand, String category, List<String> ingredients) {
         Cosmetic cosmetic = new Cosmetic(name, brand, "", category, "");
-        cosmeticRepository.save(cosmetic);
+        if (findByKeyword(name).isEmpty()) {
+            cosmeticRepository.save(cosmetic);
 
-        // 성분 가중치 매핑
-        List<Long> ingredientIds = ingredients.stream()
-                .map(i -> ingredientService.findOneIngr(i).get(0).getId())
-                .collect(toList());
+            // 성분 가중치 매핑
+            List<Long> ingredientIds = ingredients.stream()
+                    .map(i -> ingredientService.findOneIngr(i).get(0).getId())
+                    .collect(toList());
 
-        cosmeticIngredientService.createCosmeticIngredient(cosmetic.getId(), ingredientIds);
+            cosmeticIngredientService.createCosmeticIngredient(cosmetic.getId(), ingredientIds);
+        } else {
+            cosmetic = findByKeyword(name).get(0);
+        }
 
         return cosmetic;
     }
