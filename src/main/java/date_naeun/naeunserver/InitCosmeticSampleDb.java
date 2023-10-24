@@ -14,8 +14,8 @@ public class InitCosmeticSampleDb {
 
     private final InitCosmeticService initCosmeticService;
 
-    @PostConstruct
-    public void init() { initCosmeticService.dbInit(); }
+//    @PostConstruct
+//    public void init() { initCosmeticService.dbInit(); }
 
     @Component
     @Transactional
