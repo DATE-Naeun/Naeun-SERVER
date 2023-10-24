@@ -13,8 +13,8 @@ public class CosmeticDetailDto {
     private String brand;
     private String image;
     private String price;
-//    private String rating;
-//    private String reviews;
+    private String rating;
+    private String reviews;
     private Boolean isUserCosmetic;
     private List<IngredientDetailDto> ingredients;
 
@@ -23,9 +23,9 @@ public class CosmeticDetailDto {
         cosmeticName = cosmetic.getName();
         brand = cosmetic.getBrand();
         image = cosmetic.getImage();
-        price = cosmetic.getPrice().toString();
-//        this.rating = cosmetic.getRating().toString();
-//        this.reviews = cosmetic.getReviews().toString();
+        price = cosmetic.getPrice();
+        rating = cosmetic.getRating();
+        reviews = cosmetic.getReviews();
         isUserCosmetic = Boolean.FALSE; // 일단 false로 초기화
         ingredients = ingrDto;
     }
