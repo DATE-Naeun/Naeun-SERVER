@@ -23,9 +23,22 @@ public class CosmeticApiController {
 
     @PostMapping("/api/cosmetic")
     public ResultDto<CreateCosmeticFromPhotoResponseDto> createCosmeticFromPhoto(@RequestBody CreateCosmeticFromPhotoRequestDto createCosmeticFromPhotoRequestDto) {
-        Long cosmeticId = cosmeticService.createCosmeticFromPhoto(createCosmeticFromPhotoRequestDto.cosmeticName, createCosmeticFromPhotoRequestDto.brand,
-                createCosmeticFromPhotoRequestDto.category, createCosmeticFromPhotoRequestDto.ingredients).getId();
-        return ResultDto.of(HttpStatusCode.CREATED, "촬영으로 비교할 화장품 추가하기 성공", new CreateCosmeticFromPhotoResponseDto(cosmeticId));
+        try {
+            if (createCosmeticFromPhotoRequestDto.cosmeticName == null ||
+            createCosmeticFromPhotoRequestDto.cosmeticName.equals(""))
+                throw new ApiErrorException(INVALID_COSMETIC_NAME);
+            if (createCosmeticFromPhotoRequestDto.brand == null ||
+                    createCosmeticFromPhotoRequestDto.brand.equals(""))
+                throw new ApiErrorException(INVALID_BRAND_NAME);
+            if (createCosmeticFromPhotoRequestDto.ingredients.isEmpty()) throw new ApiErrorException(INGREDIENT_LIST_NOT_EXIST);
+            Long cosmeticId = cosmeticService.createCosmeticFromPhoto(createCosmeticFromPhotoRequestDto.cosmeticName, createCosmeticFromPhotoRequestDto.brand,
+                    createCosmeticFromPhotoRequestDto.category, createCosmeticFromPhotoRequestDto.ingredients).getId();
+            return ResultDto.of(HttpStatusCode.CREATED, "촬영으로 비교할 화장품 추가하기 성공", new CreateCosmeticFromPhotoResponseDto(cosmeticId));
+        } catch (ApiErrorException e) {
+            return ResultDto.of(e.getCode(), e.getErrorMsg(), null);
+        } catch (Exception e) {
+            return ResultDto.of(HttpStatusCode.INTERNAL_SERVER_ERROR, "서버 에러", null);
+        }
     }
 
     @Data

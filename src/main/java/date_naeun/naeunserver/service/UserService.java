@@ -1,5 +1,7 @@
 package date_naeun.naeunserver.service;
 
+import date_naeun.naeunserver.exception.ApiErrorException;
+import date_naeun.naeunserver.exception.ApiErrorStatus;
 import date_naeun.naeunserver.exception.AuthErrorException;
 import date_naeun.naeunserver.exception.AuthErrorStatus;
 import date_naeun.naeunserver.domain.User;
@@ -34,8 +36,13 @@ public class UserService {
     @Transactional
     /* 회원 닉네임 변경 */
     public void update(Long userId, UpdateUserNicknameRequestDto updateUserNicknameRequestDto) {
-        User user = userRepository.findOne(userId);
-        user.setName(updateUserNicknameRequestDto.getUserNickname());
+        String newName = updateUserNicknameRequestDto.getUserNickname();
+        if (userRepository.findByName(newName).isEmpty()) {
+            User user = userRepository.findOne(userId);
+            user.setName(newName);
+        } else {
+            throw new ApiErrorException(ApiErrorStatus.DUPLICATED_USER_NAME);
+        }
     }
 
     @Transactional
