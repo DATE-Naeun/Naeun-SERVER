@@ -2,20 +2,26 @@ package date_naeun.naeunserver.repository;
 
 import date_naeun.naeunserver.domain.Cosmetic;
 import date_naeun.naeunserver.domain.User;
+import date_naeun.naeunserver.exception.ApiErrorWithItemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static date_naeun.naeunserver.exception.ApiErrorStatus.*;
 
 @Repository
 @RequiredArgsConstructor
 public class ComparisonQueryRepository{
 
     private final EntityManager em;
+    private final CosmeticRepository cosmeticRepository;
 
     //== 화장품 비교 ==//
     private String createNativeQuery(Long[] idList, String skinType) {
@@ -77,6 +83,13 @@ public class ComparisonQueryRepository{
     }
 
     public List<Cosmetic> rankCosmetics(Long[] idList, User user) {
+        Set<Long> uniqueIds = new HashSet<>();
+        for (long id : idList) {
+            Object obj = id;
+            if (!(obj instanceof Long)) throw new ApiErrorWithItemException(NOT_INTEGER, id);
+            if (!uniqueIds.add(id)) throw new ApiErrorWithItemException(DUPLICATED_ID, id);
+            if (cosmeticRepository.findById(id) == null) throw new ApiErrorWithItemException(NOT_EXIST, id);
+        }
         String skinType = createSkinTypeString(user);
         String nativeQuery = createNativeQuery(idList, skinType);
         Query query = em.createNativeQuery(nativeQuery, Cosmetic.class);
