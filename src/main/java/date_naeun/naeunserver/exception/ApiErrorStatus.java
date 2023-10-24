@@ -27,7 +27,14 @@ public enum ApiErrorStatus {
 
     /* 닉네임 변경 */
     DUPLICATED_USER_NAME(HttpStatusCode.CONFLICT, "중복된 유저 닉네임입니다."),
-    INVALID_USER_NANE(HttpStatusCode.BAD_REQUEST, "유저 닉네임이 입력되지 않았습니다.");
+    INVALID_USER_NANE(HttpStatusCode.BAD_REQUEST, "유저 닉네임이 입력되지 않았습니다."),
+
+    /**
+     * 촬영으로 화장품 추가 Api 관련 에러 코드
+     */
+    INVALID_COSMETIC_NAME(HttpStatusCode.BAD_REQUEST, "제품명이 입력되지 않았습니다."),
+    INVALID_BRAND_NAME(HttpStatusCode.BAD_REQUEST, "브랜드명이 입력되지 않았습니다."),
+    INGREDIENT_LIST_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "성분 list가 없습니다.");
 
     private final HttpStatusCode code;
     private final String msg;
