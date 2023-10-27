@@ -17,8 +17,8 @@ public class InitIngrSampleDb {
 
     private final InitIngredientService initIngr_service;
 
-    @PostConstruct
-    public void init() { initIngr_service.dbInit(); }
+//    @PostConstruct
+//    public void init() { initIngr_service.dbInit(); }
 
     @Component
     @Transactional
