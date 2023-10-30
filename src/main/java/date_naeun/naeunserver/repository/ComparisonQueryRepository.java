@@ -114,7 +114,7 @@ public class ComparisonQueryRepository{
         String category = "";
         switch (categoryId) {
             case 1:
-                category = "크림";
+                category = "수분크림";
                 break;
             case 2:
                 category = "선크림";

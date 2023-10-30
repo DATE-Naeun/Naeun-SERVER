@@ -4,49 +4,62 @@ import date_naeun.naeunserver.domain.CosmeticIngredient;
 import date_naeun.naeunserver.repository.CosmeticRepository;
 import date_naeun.naeunserver.repository.IngredientRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Iterator;
 
 @Component
 @RequiredArgsConstructor
 public class InitCsmtIngrDb {
 
-    private final InitCosmeticService initCosmeticService;
-
-    @PostConstruct
-    public void init() { initCosmeticService.dbInit(); }
-
     @Component
     @Transactional
     @RequiredArgsConstructor
-    static class InitCosmeticService {
+    static class InitCsmtIngrDbService {
 
         private final EntityManager em;
         private final CosmeticRepository cosmeticRepository;
         private final IngredientRepository ingredientRepository;
 
-        public void dbInit() {
-            createCosmetic(1L, new ArrayList<>(Arrays.asList(1L, 6L, 8L)));
-            createCosmetic(2L, new ArrayList<>(Arrays.asList(1L, 9L)));
-            createCosmetic(3L, new ArrayList<>(Arrays.asList(2L, 5L)));
+        public void initDb() {
+            try (
+                FileInputStream fis = new FileInputStream("src/main/resources/Cosign_Dataset_v2.xlsx");
+                Workbook workbook = new XSSFWorkbook(fis)) {
+
+                Sheet sheet = workbook.getSheetAt(0);
+
+                Iterator<Row> rowIterator = sheet.iterator();
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+                    if (row.getRowNum() == 0) {
+                        continue;
+                    }
+
+                    if (row.getCell(0) != null && row.getCell(1) != null && row.getCell(2) != null) {
+                        Long csmt_id = (long) row.getCell(0).getNumericCellValue();
+                        Long ingr_id = (long) row.getCell(1).getNumericCellValue();
+                        Double weight = row.getCell(2).getNumericCellValue();
+
+                        createCosmetic(csmt_id, ingr_id, weight);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        private final double[] weight = {12, 10, 8.2, 6.6, 5.2, 4, 3, 2.2, 1.6, 1.2, 1};
-
-        private void createCosmetic(Long cosmeticId,
-                                    List<Long> ingredientList) {
+        private void createCosmetic(Long csmt_id,
+                                    Long ingr_id, Double weight) {
 
             CosmeticIngredient cosmeticIngredient;
-            for (int i = 0; i < ingredientList.size(); i++) {
-                cosmeticIngredient = new CosmeticIngredient(cosmeticRepository.findById(cosmeticId), ingredientRepository.find(ingredientList.get(i)), weight[i]);
-                em.persist(cosmeticIngredient);
-            }
+            cosmeticIngredient = new CosmeticIngredient(cosmeticRepository.findById(csmt_id), ingredientRepository.find(ingr_id), weight);
+            em.persist(cosmeticIngredient);
         }
     }
 }

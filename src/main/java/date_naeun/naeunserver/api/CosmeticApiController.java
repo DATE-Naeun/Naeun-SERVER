@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static date_naeun.naeunserver.exception.ApiErrorStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 public class CosmeticApiController {

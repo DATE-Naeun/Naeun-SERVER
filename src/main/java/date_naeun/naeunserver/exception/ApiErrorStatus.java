@@ -35,7 +35,7 @@ public enum ApiErrorStatus {
      */
     INVALID_COSMETIC_NAME(HttpStatusCode.BAD_REQUEST, "제품명이 입력되지 않았습니다."),
     INVALID_BRAND_NAME(HttpStatusCode.BAD_REQUEST, "브랜드명이 입력되지 않았습니다."),
-    INGREDIENT_LIST_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "성분 list가 없습니다.");
+    INGREDIENT_LIST_NOT_EXIST(HttpStatusCode.BAD_REQUEST, "성분 list가 없습니다."),
 
     /**
      * Ingredient Api 관련 에러 코드

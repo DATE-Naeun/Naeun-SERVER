@@ -20,8 +20,17 @@ import java.util.Iterator;
 public class InitCosmeticDb {
 
     private final InitCosmeticDbService initCosmeticDbService;
+    private final InitIngredientDb.InitIngredientDbService initIngredientDbService;
+    private final InitCsmtIngrDb.InitCsmtIngrDbService initCsmtIngrDbService;
+    private final InitIngrDetailDb.InitIngrDetailDbService initIngrDetailDbService;
+
     @PostConstruct
-    public void init() { initCosmeticDbService.initDb(); }
+    public void init() {
+        initIngredientDbService.initDb();
+        initCosmeticDbService.initDb();
+        initCsmtIngrDbService.initDb();
+        initIngrDetailDbService.initDb();
+    }
 
     @Component
     @Transactional
@@ -31,8 +40,9 @@ public class InitCosmeticDb {
         private final EntityManager em;
 
         public void initDb() {
-            try (FileInputStream fis = new FileInputStream("src/main/resources/Cosign_Dataset_v1.xlsx");
-                 Workbook workbook = new XSSFWorkbook(fis)) {
+            try (
+                FileInputStream fis = new FileInputStream("src/main/resources/Cosign_Dataset_v2.xlsx");
+                Workbook workbook = new XSSFWorkbook(fis)) {
 
                 Sheet sheet = workbook.getSheetAt(1);
 
@@ -55,8 +65,6 @@ public class InitCosmeticDb {
                         if (priceCell.getCellType() == CellType.NUMERIC) {
                             double priceDouble = priceCell.getNumericCellValue();
                             priceInt = (int) priceDouble;
-                        } else {
-                            priceInt = 0;
                         }
                     }
 
