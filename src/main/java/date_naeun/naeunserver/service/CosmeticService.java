@@ -27,7 +27,7 @@ public class CosmeticService {
         if (findByKeyword(name).isEmpty()) {
             cosmeticRepository.save(cosmetic);
 
-            // 성분 가중치 매핑
+            // 성분 id 매핑
             List<Long> ingredientIds = ingredients.stream()
                     .map(i -> ingredientService.findOneIngr(i).get(0).getId())
                     .collect(toList());
